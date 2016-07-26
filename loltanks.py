@@ -8,7 +8,7 @@ from math import *
 from random import randint, choice, uniform
 
 default_conf = {
-  'gamename'        : 'Le Tank Game',
+  'gamename'        : 'loltanks',
   'gravity'         : 0.01,
   'sky_min'         : 10,
   'ground_min'      : 3,
