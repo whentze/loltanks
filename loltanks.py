@@ -56,7 +56,7 @@ class Explosion():
       return
     else:
       self.age += 1
-   
+
   def draw(self, win):
     h, w = win.getmaxyx()
     for i in range(self.age):
@@ -80,7 +80,7 @@ class Shot():
     self.owner    = owner
     self.world    = owner.world
     self.conf     = conf
-  
+
   def draw(self, win):
     h, w =win.getmaxyx()
     if(self.y < 0):
@@ -138,7 +138,7 @@ class Tank():
     r' ___  ',
     r'/lol\=',
     r'OOOOO ']
-  
+
   def draw(self, win):
     display_y = self.y - 2
     display_x = self.x - int(max([len(line) for line in self.pic])/2)
@@ -200,7 +200,7 @@ class Tank():
       ''' OOOOO''']
     if(all([not self.world.check_collision(xi, self.y+1) for xi in range(self.x-2, self.x+3)])):
       self.y += 1
-  
+
   def processkey(self, key):
     if (key == ord(' ')):
       self.shoot()
@@ -240,7 +240,7 @@ class World():
     for x in range(w):
       for y in range(h):
         ground[x][y] = levels[x] < y
-    
+
     gameobjects = [self]
     players     = []
     for i in range(conf['players_number']):
@@ -249,7 +249,7 @@ class World():
       newplayer = Tank(x, min(levels[x-2:x+3]), "Player {:d}".format(i+1), i+1, self, conf)
       players += [newplayer]
       gameobjects += [newplayer]
-    
+
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
     self.snow         = int(h*w*conf['snow_max']/100.0)
     self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,80)] for i in range(self.snow)]
@@ -257,13 +257,13 @@ class World():
     self.conf         = conf
     self.players      = players
     self.gameobjects  = gameobjects
-  
+
   def update(self, win):
     h, w = win.getmaxyx()
     for flake in self.snowflakes:
       flake[0] += self.wind * self.conf['wind_force'] * flake[2]
       flake[1] += self.conf['gravity'] * flake[2] * 0.2
-  
+
   def draw(self, win):
     # Draw Snow
     h, w = win.getmaxyx()
@@ -284,7 +284,7 @@ class World():
             win.addch(y, x, '█')
           except curses.error:
             pass
-  
+
   def check_collision(self, x, y):
     if (y >= len(self.ground[0])):
       return True
@@ -336,7 +336,7 @@ def confmenu(conf, win):
     else:
       win.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
     win.refresh()
-    
+
     key = win.getch()
     if((pos == len(entries) and key == ord(' ')) or key == ord('\n')):
       # Save Config and start game
@@ -353,7 +353,7 @@ def confmenu(conf, win):
       pos = (pos - 1)%(len(entries)+1)
     elif (key == curses.KEY_DOWN):
       pos = (pos + 1)%(len(entries)+1)
-      
+
 # Main Program
 def main(screen):
   screen.clear()
@@ -361,10 +361,10 @@ def main(screen):
   curses.curs_set(False)
   width = curses.COLS
   height = curses.LINES
-  
+
   if(height < 20 or width < 50):
     raise RuntimeError("This terminal is too damn small!")
-  
+
   conf = {}
   for key in default_conf:
     conf[key] = default_conf[key]
@@ -372,20 +372,20 @@ def main(screen):
   screen.addstr(int(height/2)+2, int((width-22)/2), 'press any key to play!')
   screen.refresh()
   screen.getch()
-  
+
   confmenu(conf, screen)
-  
+
   screen.nodelay(True)
   screen.clear()
   screen.refresh()
   mainwin = curses.newwin(height-6, width, 0, 0)
   statuswin = curses.newwin(6, width, height-6, 0)
-  
+
   while(1):
     world = World(mainwin, conf)
     activeplayer = 0
     n_turns = 1
-    
+
     for p in itertools.cycle(world.players):
       if(p.isdead):
         continue
@@ -401,7 +401,6 @@ def main(screen):
       if (len([p for p in world.players if not p.isdead]) == 0):
         gameover(screen, None)
         break
-          
     n_turns += 1
 
 def gameover(screen, winner):
@@ -419,17 +418,16 @@ def gameover(screen, winner):
   return  
 
 def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
-  
   t_begin = time.clock()
   h, w = mainwin.getmaxyx()
   mainwin.erase()
   statuswin.erase()
-  
+
   # Status Window
   statuswin.box()
   heigth, width = statuswin.getmaxyx()
   statuswin.addstr(0, int((width-len(conf['gamename'])-2)/2), ' '+conf['gamename']+' ')
-  
+
   # Player Stats
   for i,player in enumerate(world.players):
     stats_x = 2 + int(width * i/(1+len(world.players)))
@@ -438,7 +436,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     statuswin.addstr(stats_y+1, stats_x, "HP   : {:d}".format(player.health))
     statuswin.addstr(stats_y+2, stats_x, "Angle: {:.1f}°".format(degrees(player.angle)))
     statuswin.addstr(stats_y+3, stats_x, "Power: {:.0%}".format(player.power))
-  
+
   # Global Stats
   stats_x = 2 + int(width * len(world.players)/(1+len(world.players)))
   statuswin.addstr(1, stats_x, "Turn : {:d}".format(n_turns))
@@ -452,7 +450,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     statuswin.addstr(2, stats_x, "Wind : " + windstr)
   else:
     statuswin.addstr(2, stats_x, "Wind : " + str(abs(world.wind)) + windstr[0])
-  
+
   # Main Window
   for obj in world.gameobjects:
     obj.update(mainwin)
@@ -461,12 +459,12 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     key = screen.getch()
   except Error:  
     pass
-  
+
   if(not currentplayer.shot_fired):
     currentplayer.processkey(key)
   else:
     mainwin.addstr(1,1,'shots fired!')
-  
+
   mainwin.refresh()
   statuswin.refresh()
   t_end = time.clock()
