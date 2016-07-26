@@ -242,7 +242,7 @@ class World():
     players     = []
     for i in range(conf['players_number']):
       curses.init_pair(i+1, conf['players_colors'][i], curses.COLOR_BLACK)
-      x = int(w*(i+1.0)*0.20)
+      x = int(w*(i+1.0)/(conf['players_number']+1))
       newplayer = Tank(x, min(levels[x-2:x+3]), "Player {:d}".format(i+1), i+1, self, conf)
       players += [newplayer]
       gameobjects += [newplayer]
