@@ -2,7 +2,7 @@
 
 A turn-based artillery game with a curses frontend.
 
-![a screenshot](screenshot.png)
+![a screenshot](screenshot.gif)
 
 ### Dependencies
 
