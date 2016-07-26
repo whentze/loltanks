@@ -22,6 +22,7 @@ default_conf = {
   'snow_max'        : 1.0,
   'explosion_damage': 30,
   'explosion_radius': 5,
+  'shot_age'        : 500,
 }
 
 # Helper Functions
@@ -109,7 +110,7 @@ class Shot():
       self.owner.isdone = True
       self.despawn()
       return
-    elif (self.world.check_collision(self.x, self.y) or self.age > 7 and min([dist(self, p) for p in self.world.players]) < 2):
+    elif (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y) or self.age > 7 and min([dist(self, p) for p in self.world.players]) < 2):
       self.explode()
       return
     self.x += self.speed_x
@@ -309,6 +310,7 @@ def confmenu(conf, win):
     Menuentry('tank_health', 'Player Health', conf, [1, 25, 50, 100, 150, 200]),
     Menuentry('explosion_damage', 'Shot Damage', conf, range(10,51,10)),
     Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,10)),
+    Menuentry('gravity',  'Gravity', conf, [0.001 * i for i in range(50)]),
     Menuentry('wind_max', 'Wind', conf, range(11)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
   ]
