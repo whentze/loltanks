@@ -129,7 +129,7 @@ class Tank():
     self.angle      = pi/4
     self.isdead     = False
     self.shot_fired = False
-    self.isdone     = False
+    self.isdone     = True
     self.power      = 0.50
     self.pic =[
     r' ___  ',
@@ -140,7 +140,7 @@ class Tank():
     display_y = self.y - 2
     display_x = self.x - int(max([len(line) for line in self.pic])/2)
     # Draw Crosshair
-    if (not self.isdead):
+    if (not self.isdone):
       for i in range(10):
         line_x = int(self.x + cos(self.angle) * (self.power*4.0*i))
         line_y = int(self.y - sin(self.angle) * (self.power*4.0*i))
