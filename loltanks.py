@@ -19,8 +19,8 @@ default_conf = {
   'wind_max'        : 5,
   'wind_change'     : 2,
   'wind_force'      : 0.0010,
-  'snow_max'        : 0.05,
-  'explosion_damage': 3,
+  'snow_max'        : 1.0,
+  'explosion_damage': 30,
   'explosion_radius': 5,
 }
 
@@ -44,20 +44,22 @@ class Explosion():
     self.radius = conf['explosion_radius']
   def update(self, win):
     if(self.age >= self.radius):
-       self.world.gameobjects.remove(self)
-       self.owner.isdone = True
-       del(self)
-       return
+      for p in self.world.players:
+        d = max(dist(self, p) - 2, 0) 
+        if (d < self.radius):
+         damage = self.damage * (self.radius - d)/self.radius
+         p.health = max(0, int(p.health - damage))
+      self.world.gameobjects.remove(self)
+      self.owner.isdone = True
+      del(self)
+      return
     else:
       self.age += 1
-      for p in self.world.players:
-        if (dist(self, p) < self.age+1):
-          p.health = max(0, p.health - int(self.damage * (self.age+1 - dist(self, p))))
    
   def draw(self, win):
     h, w = win.getmaxyx()
     for i in range(self.age):
-      for theta in range(0, 360, 10):
+      for theta in range(0, 360, 4):
         display_x = clamp(int(self.x + cos(radians(theta)) * i), 0, w)
         display_y = clamp(int(self.y - sin(radians(theta)) * i), 0, h)
         if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
@@ -248,7 +250,7 @@ class World():
       gameobjects += [newplayer]
     
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
-    self.snow         = int(choice([0,0,0.1,0.3,0.5,1.0]) * h*w*conf['snow_max'])
+    self.snow         = int(h*w*conf['snow_max']/100.0)
     self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,20)] for i in range(self.snow)]
     self.ground       = ground
     self.conf         = conf
@@ -290,6 +292,66 @@ class World():
     else:
       return self.ground[int(x)][int(y)]
 
+class Menuentry():
+  def __init__(self, key, name, conf, possible_values):
+    self.key              = key
+    self.name             = name
+    self.possible_values  = possible_values
+    self.index            = possible_values.index(conf[key])
+
+# Configuration Menu
+def confmenu(conf, win):
+  h,w = win.getmaxyx()
+  win.clear()
+  pos = 0
+  entries=[
+    Menuentry('players_number', 'Number of Players', conf, range(2,5)),
+    Menuentry('tank_health', 'Player Health', conf, [1, 25, 50, 100, 150, 200]),
+    Menuentry('explosion_damage', 'Shot Damage', conf, range(10,51,10)),
+    Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,10)),
+    Menuentry('wind_max', 'Wind', conf, range(11)),
+    Menuentry('snow_max', 'Snow', conf, range(11)),
+  ]
+  while(1):
+    win.erase()
+    for y,entry in enumerate(entries):
+      if(entry.index > 0):
+        leftarrow = '<'
+      else:
+        leftarrow = ' '
+      if(entry.index < len(entry.possible_values)-1):
+        rightarrow = '>'
+      else:
+        rightarrow = ' '
+      if(y == pos):
+        win.addstr(2*y+1, int(w/2) - len(entry.name)-2,
+          entry.name+" ~:~ "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
+      else:
+        win.addstr(2*y+1, int(w/2) - len(entry.name)-2,
+          entry.name+"  :  "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
+    if(pos == len(entries)):
+      win.addstr(2*len(entries)+1, int(w/2) - 6, '~Start Game!~')
+    else:
+      win.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
+    win.refresh()
+    
+    key = win.getch()
+    if((pos == len(entries) and key == ord(' ')) or key == ord('\n')):
+      # Save Config and start game
+      for e in entries:
+        conf[e.key] = e.possible_values[e.index]
+      return
+    elif(pos != len(entries)):
+      entry = entries[pos]
+      if (key == curses.KEY_LEFT):
+        entry.index = max(entry.index - 1, 0)
+      elif (key == curses.KEY_RIGHT):
+        entry.index = min(entry.index + 1, len(entry.possible_values) - 1)
+    if (key == curses.KEY_UP):
+      pos = (pos - 1)%(len(entries)+1)
+    elif (key == curses.KEY_DOWN):
+      pos = (pos + 1)%(len(entries)+1)
+      
 # Main Program
 def main(screen):
   screen.clear()
@@ -297,7 +359,10 @@ def main(screen):
   curses.curs_set(False)
   width = curses.COLS
   height = curses.LINES
-  conf = default_conf
+  conf = {}
+  for key in default_conf:
+    conf[key] = default_conf[key]
+  
   if(height < 20 or width < 60):
     print("Your terminal is too damn small!")
     exit()
@@ -306,8 +371,10 @@ def main(screen):
   screen.refresh()
   screen.getch()
   
-  screen.clear()
+  confmenu(conf, screen)
+  
   screen.nodelay(True)
+  screen.clear()
   screen.refresh()
   mainwin = curses.newwin(height-6, width, 0, 0)
   statuswin = curses.newwin(6, width, height-6, 0)
