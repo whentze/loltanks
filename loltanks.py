@@ -84,7 +84,7 @@ class Explosion():
         if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
           self.world.ground[display_x][display_y] = False
         try:
-          win.addch(display_y, display_x, '#')
+          win.addstr(display_y, display_x, '#')
         except curses.error:
           pass   
 
@@ -121,7 +121,7 @@ class Shot():
           
           d = lines()[(dif_y, dif_x)]
           win.addstr(tup[0], tup[1], choice(['⁙','⁖',d, d]))
-        win.addch(display_y, display_x, c)
+        win.addstr(display_y, display_x, c)
       except curses.error:
         pass
     self.tail += [(display_y, display_x)]
@@ -220,17 +220,17 @@ class Tank():
         line_y = int(self.y - sin(self.angle) * (self.power*4.0*i))
         try:
           if(i == 9):
-            win.addch(line_y, line_x, '✜', curses.color_pair(self.colors))
+            win.addstr(line_y, line_x, '✜', curses.color_pair(self.colors))
           else:
-            win.addch(line_y, line_x, '·', curses.color_pair(self.colors))
+            win.addstr(line_y, line_x, '·', curses.color_pair(self.colors))
         except curses.error:
           pass
     # Draw Tank
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
         if(char != ' '):
-          win.addch(display_y+n, display_x+k, char)
-    win.addch(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
+          win.addstr(display_y+n, display_x+k, char)
+    win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
 
   def update(self, win):
     if(all([not self.world.check_collision(xi, self.y+1) for xi in range(self.x-2, self.x+3)])):
@@ -308,9 +308,9 @@ class World():
     for flake in self.snowflakes:
       try:
         if(flake[2] > 60):
-          win.addch(int(flake[1]), int(flake[0]), '∗')
+          win.addstr(int(flake[1]), int(flake[0]), '∗')
         else:
-          win.addch(int(flake[1]), int(flake[0]), '·')
+          win.addstr(int(flake[1]), int(flake[0]), '·')
       except curses.error:
         flake[0] = flake[0]%w
         flake[1] = flake[1]%h
@@ -319,7 +319,7 @@ class World():
       for y, cell in enumerate(col):
         if(cell):
           try:
-            win.addch(y, x, '█')
+            win.addstr(y, x, '█')
           except curses.error:
             pass
 
