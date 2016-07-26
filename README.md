@@ -44,4 +44,3 @@ Up/Down     : Change cannon elevation
 - Prettier Tanks
 - A menu
 - In-game-instructions
-- In-game-configuration
