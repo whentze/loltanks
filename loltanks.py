@@ -381,22 +381,45 @@ def main(screen):
   mainwin = curses.newwin(height-6, width, 0, 0)
   statuswin = curses.newwin(6, width, height-6, 0)
   
-  world = World(mainwin, conf)
-  activeplayer = 0
-  n_turns = 1
-  
-  for p in itertools.cycle(world.players):
-    if(p.isdead):
-      continue
-    world.wind = randint(max(-conf['wind_max'], world.wind-conf['wind_change']),
-                         min( conf['wind_max'], world.wind+conf['wind_change']))
-    p.isdone = False
-    p.shot_fired = False
-    while (not p.isdone):
-      gamestep(screen, mainwin, statuswin, p, world, conf, n_turns)
+  while(1):
+    world = World(mainwin, conf)
+    activeplayer = 0
+    n_turns = 1
+    
+    for p in itertools.cycle(world.players):
+      if(p.isdead):
+        continue
+      world.wind = randint(max(-conf['wind_max'], world.wind-conf['wind_change']),
+                           min( conf['wind_max'], world.wind+conf['wind_change']))
+      p.isdone = False
+      p.shot_fired = False
+      while (not p.isdone):
+        gamestep(screen, mainwin, statuswin, p, world, conf, n_turns)
+      if (len([p for p in world.players if not p.isdead]) == 1):
+        gameover(screen, [p for p in world.players if not p.isdead][0])
+        break
+      if (len([p for p in world.players if not p.isdead]) == 0):
+        gameover(screen, None)
+        break
+          
     n_turns += 1
 
+def gameover(screen, winner):
+  height, width = screen.getmaxyx()
+  screen.erase()
+  if(winner == None):
+    screen.addstr(int(height/2), int((width-len("Everyone died!"))/2), "Everyone died!")
+  else:
+    screen.addstr(int(height/2), int((width-len(winner.name + " has won!"))/2), winner.name + " has won!")
+  screen.addstr(int(height/2)+2, int((width-22)/2), 'Press any key to play again!')
+  screen.refresh()
+  screen.nodelay(False)
+  screen.getch()
+  screen.nodelay(True)
+  return  
+
 def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
+  
   t_begin = time.clock()
   h, w = mainwin.getmaxyx()
   mainwin.erase()
