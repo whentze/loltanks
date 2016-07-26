@@ -175,28 +175,6 @@ class Tank():
     r'OOOOO ']
 
   def draw(self, win):
-    display_y = self.y - 2
-    display_x = self.x - int(max([len(line) for line in self.pic])/2)
-    # Draw Crosshair
-    if (not self.isdone):
-      for i in range(10):
-        line_x = int(self.x + cos(self.angle) * (self.power*4.0*i))
-        line_y = int(self.y - sin(self.angle) * (self.power*4.0*i))
-        try:
-          if(i == 9):
-            win.addch(line_y, line_x, '✜', curses.color_pair(self.colors))
-          else:
-            win.addch(line_y, line_x, '·', curses.color_pair(self.colors))
-        except curses.error:
-          pass
-    # Draw Tank
-    for n,line in enumerate(self.pic):
-      for k, char in enumerate(line):
-        if(char != ' '):
-          win.addch(display_y+n, display_x+k, char)
-    win.addch(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
-
-  def update(self, win):
     if(self.health <= 0):
       self.isdead = True
       self.pic =[
@@ -233,6 +211,28 @@ class Tank():
       '''  ___ ''',
       '''=/lol\\''',
       ''' OOOOO''']
+    display_y = self.y - 2
+    display_x = self.x - int(max([len(line) for line in self.pic])/2)
+    # Draw Crosshair
+    if (not self.isdone):
+      for i in range(10):
+        line_x = int(self.x + cos(self.angle) * (self.power*4.0*i))
+        line_y = int(self.y - sin(self.angle) * (self.power*4.0*i))
+        try:
+          if(i == 9):
+            win.addch(line_y, line_x, '✜', curses.color_pair(self.colors))
+          else:
+            win.addch(line_y, line_x, '·', curses.color_pair(self.colors))
+        except curses.error:
+          pass
+    # Draw Tank
+    for n,line in enumerate(self.pic):
+      for k, char in enumerate(line):
+        if(char != ' '):
+          win.addch(display_y+n, display_x+k, char)
+    win.addch(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
+
+  def update(self, win):
     if(all([not self.world.check_collision(xi, self.y+1) for xi in range(self.x-2, self.x+3)])):
       self.y += 1
 
@@ -356,8 +356,18 @@ def confmenu(conf, win):
 
   pad = curses.newpad(2*len(entries) + 3, w)
 
+  model1 = Tank(int(w/2) - 20, 5, 'model1', curses.color_pair(0), None, conf)
+  model1.angle = 0
+  model2 = Tank(int(w/2) + 20, 5, 'model1', curses.color_pair(0), None, conf)
+  model2.angle = pi
+
   while(1):
     pad.erase()
+    win.erase()
+    welcome = 'welcome to ' + conf['gamename'] + '!'
+    win.addstr(3, int((w-len(welcome))/2), welcome)
+    model1.draw(win)
+    model2.draw(win)
     for y,entry in enumerate(entries):
       if(entry.index > 0):
         leftarrow = '< '
@@ -377,9 +387,8 @@ def confmenu(conf, win):
       pad.addstr(2*len(entries)+1, int(w/2) - 6, '~Start Game!~')
     else:
       pad.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
-    win.erase()
     win.refresh()
-    pad.refresh(max(2*pos+5 - h, 0), 0, 0, 0, h-1, w-1)
+    pad.refresh(max(2*pos+5 - h, 0), 0, 9, 0, h-1, w-1)
 
     key = win.getch()
     if((pos == len(entries) and key == ord(' ')) or key == ord('\n')):
@@ -409,14 +418,7 @@ def main(screen):
   if(height < 20 or width < 50):
     raise RuntimeError("This terminal is too damn small!")
 
-  conf = {}
-  for key in default_conf:
-    conf[key] = default_conf[key]
-  screen.addstr(int(height/2), int((width-len(conf['gamename']))/2), conf['gamename'])
-  screen.addstr(int(height/2)+2, int((width-22)/2), 'press any key to play!')
-  screen.refresh()
-  screen.getch()
-
+  conf = default_conf
   confmenu(conf, screen)
 
   screen.nodelay(True)
