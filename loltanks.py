@@ -244,7 +244,10 @@ class World():
     ground = [[False]*h for x in range(w)]
     levels = [randint(conf['sky_min'], h - conf['ground_min'])]
     for x in range(1, w):
-      levels += [clamp(levels[-1] + choice([0,0,-1,1]), 4, h-1)]
+      levels += [clamp(
+          levels[-1] + choice([0,0,-1,1]),
+          conf['sky_min'],
+          h - conf['ground_min'])]
     
     for x in range(w):
       for y in range(h):
