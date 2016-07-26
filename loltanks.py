@@ -324,28 +324,33 @@ def confmenu(conf, win):
     Menuentry('snow_max', 'Snow', conf, range(11)),
     Menuentry('world_border', 'World Border', conf, ['Void', 'Loop', 'Wall']),
   ]
+
+  pad = curses.newpad(2*len(entries) + 3, w)
+
   while(1):
-    win.erase()
+    pad.erase()
     for y,entry in enumerate(entries):
       if(entry.index > 0):
-        leftarrow = '<'
+        leftarrow = '< '
       else:
-        leftarrow = ' '
+        leftarrow = '  '
       if(entry.index < len(entry.possible_values)-1):
-        rightarrow = '>'
+        rightarrow = ' >'
       else:
-        rightarrow = ' '
+        rightarrow = '  '
       if(y == pos):
-        win.addstr(2*y+1, int(w/2) - len(entry.name)-2,
+        pad.addstr(2*y+1, int(w/2) - len(entry.name)-3,
           entry.name+" ~:~ "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
       else:
-        win.addstr(2*y+1, int(w/2) - len(entry.name)-2,
+        pad.addstr(2*y+1, int(w/2) - len(entry.name)-3,
           entry.name+"  :  "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
     if(pos == len(entries)):
-      win.addstr(2*len(entries)+1, int(w/2) - 6, '~Start Game!~')
+      pad.addstr(2*len(entries)+1, int(w/2) - 6, '~Start Game!~')
     else:
-      win.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
+      pad.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
+    win.erase()
     win.refresh()
+    pad.refresh(max(2*pos+5 - h, 0), 0, 0, 0, h-1, w-1)
 
     key = win.getch()
     if((pos == len(entries) and key == ord(' ')) or key == ord('\n')):
