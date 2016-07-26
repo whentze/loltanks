@@ -9,7 +9,7 @@ from random import randint, choice, uniform
 
 default_conf = {
   'gamename'        : 'loltanks',
-  'gravity'         : 0.01,
+  'gravity'         : 10,
   'sky_min'         : 10,
   'ground_min'      : 3,
   'players_number'  : 3,
@@ -116,7 +116,7 @@ class Shot():
     self.x += self.speed_x
     self.y -= self.speed_y
     self.speed_x += self.conf['wind_force']*self.world.wind
-    self.speed_y -= self.conf['gravity']
+    self.speed_y -= self.conf['gravity'] * 0.001
     self.age += 1
 
 class Tank():
@@ -262,7 +262,7 @@ class World():
     h, w = win.getmaxyx()
     for flake in self.snowflakes:
       flake[0] += self.wind * self.conf['wind_force'] * flake[2]
-      flake[1] += self.conf['gravity'] * flake[2] * 0.2
+      flake[1] += self.conf['gravity'] * flake[2] * 0.0002
 
   def draw(self, win):
     # Draw Snow
@@ -310,7 +310,7 @@ def confmenu(conf, win):
     Menuentry('tank_health', 'Player Health', conf, [1, 25, 50, 100, 150, 200]),
     Menuentry('explosion_damage', 'Shot Damage', conf, range(10,51,10)),
     Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,10)),
-    Menuentry('gravity',  'Gravity', conf, [0.001 * i for i in range(50)]),
+    Menuentry('gravity',  'Gravity', conf, range(51)),
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
   ]
