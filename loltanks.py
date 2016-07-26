@@ -12,6 +12,7 @@ default_conf = {
   'gravity'         : 10,
   'sky_min'         : 10,
   'ground_min'      : 3,
+  'world_border'   : 'Void',
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
   'tank_health'     : 100,
@@ -61,7 +62,10 @@ class Explosion():
     h, w = win.getmaxyx()
     for i in range(self.age):
       for theta in range(0, 360, 4):
-        display_x = clamp(int(self.x + cos(radians(theta)) * i), 0, w)
+        if(self.conf['world_border'] == 'Loop'):
+          display_x = int(self.x + cos(radians(theta)) * i) % w
+        else:
+          display_x = clamp(int(self.x + cos(radians(theta)) * i), 0, w)
         display_y = clamp(int(self.y - sin(radians(theta)) * i), 0, h)
         if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
           self.world.ground[display_x][display_y] = False
@@ -99,6 +103,7 @@ class Shot():
       except curses.error:
         pass
   def despawn(self):
+    self.owner.isdone = True
     self.world.gameobjects.remove(self)
     del(self)
   def explode(self):
@@ -106,8 +111,12 @@ class Shot():
     self.despawn()
   def update(self, win):
     h, w = win.getmaxyx()
+    if(self.x < 0 or self.x >= w):
+        if(self.conf['world_border'] == 'Loop'):
+          self.x = self.x % w
+        elif(self.conf['world_border'] == 'Wall'):
+          self.explode()
     if (self.y > h):
-      self.owner.isdone = True
       self.despawn()
       return
     elif (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y) or self.age > 7 and min([dist(self, p) for p in self.world.players]) < 2):
@@ -313,6 +322,7 @@ def confmenu(conf, win):
     Menuentry('gravity',  'Gravity', conf, range(51)),
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
+    Menuentry('world_border', 'World Border', conf, ['Void', 'Loop', 'Wall']),
   ]
   while(1):
     win.erase()
