@@ -12,7 +12,7 @@ default_conf = {
   'gravity'         : 10,
   'sky_min'         : 10,
   'ground_min'      : 3,
-  'world_border'   : 'Void',
+  'world_border'    : 'Void',
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
   'tank_health'     : 100,
@@ -351,23 +351,26 @@ def confmenu(conf, win):
     Menuentry('gravity',  'Gravity', conf, range(51)),
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
-    Menuentry('world_border', 'World Border', conf, ['Void', 'Loop', 'Wall']),
+    Menuentry('world_border', 'World Border', conf, ['Void', 'Wall', 'Loop']),
   ]
 
   pad = curses.newpad(2*len(entries) + 3, w)
 
-  model1 = Tank(int(w/2) - 20, 5, 'model1', curses.color_pair(0), None, conf)
+  model1 = Tank(int(w/2) - 20, 2, 'model1', curses.color_pair(0), None, conf)
   model1.angle = 0
-  model2 = Tank(int(w/2) + 20, 5, 'model1', curses.color_pair(0), None, conf)
+  model2 = Tank(int(w/2) + 20, 2, 'model1', curses.color_pair(0), None, conf)
   model2.angle = pi
 
   while(1):
     pad.erase()
     win.erase()
     welcome = 'welcome to ' + conf['gamename'] + '!'
-    win.addstr(3, int((w-len(welcome))/2), welcome)
+    win.addstr(1, int((w-len(welcome))/2), welcome)
     model1.draw(win)
+    win.addstr(model1.y-1, model1.x+5, '-=●')
     model2.draw(win)
+    win.addstr(model2.y-1, model2.x-7, '●=-')
+
     for y,entry in enumerate(entries):
       if(entry.index > 0):
         leftarrow = '< '
@@ -378,17 +381,24 @@ def confmenu(conf, win):
       else:
         rightarrow = '  '
       if(y == pos):
-        pad.addstr(2*y+1, int(w/2) - len(entry.name)-3,
+        pad.addstr(y, int(w/2) - len(entry.name)-3,
           entry.name+" ~:~ "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
       else:
-        pad.addstr(2*y+1, int(w/2) - len(entry.name)-3,
+        pad.addstr(y, int(w/2) - len(entry.name)-3,
           entry.name+"  :  "+leftarrow+str(entry.possible_values[entry.index])+rightarrow)
     if(pos == len(entries)):
-      pad.addstr(2*len(entries)+1, int(w/2) - 6, '~Start Game!~')
+      pad.addstr(len(entries), int(w/2) - 6, '~Start Game!~')
     else:
-      pad.addstr(2*len(entries)+1, int(w/2) - 5, 'Start Game!')
+      pad.addstr(len(entries), int(w/2) - 5, 'Start Game!')
     win.refresh()
-    pad.refresh(max(2*pos+5 - h, 0), 0, 9, 0, h-1, w-1)
+    pad.refresh(max(pos+11 - h, 0), 0, 4, 0, h-7, w-1)
+
+    instructions = curses.newwin(5, w - 20, h - 5, 10)
+    instructions.addstr(1, 1, 'How to play:')
+    instructions.addstr(2, 1, '           Space : Fire          +/- : Adjust Velocity')
+    instructions.addstr(3, 1, '         Up/Down : Aim    Left/Right : Change Direction')
+    instructions.box()
+    instructions.refresh()
 
     key = win.getch()
     if((pos == len(entries) and key == ord(' ')) or key == ord('\n')):

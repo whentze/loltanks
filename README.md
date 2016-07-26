@@ -42,5 +42,3 @@ Up/Down     : Change cannon elevation
 - Prettier Landscape
 - More interesting Landscape Generation
 - Prettier Tanks
-- A menu
-- In-game-instructions
