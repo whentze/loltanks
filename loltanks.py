@@ -24,6 +24,7 @@ default_conf = {
   'explosion_damage': 30,
   'explosion_radius': 5,
   'shot_age'        : 500,
+  'shot_tail'        : 7,
 }
 
 # Helper Functions
@@ -32,6 +33,19 @@ def dist(obj_a, obj_b):
 
 def clamp(val, low, high):
   return max(low, min(high, val))
+
+def lines():
+  return {
+    ( 1, 1) : '\\',
+    ( 1, 0) : '|',
+    ( 1,-1) : '/',
+    ( 0, 1) : '-',
+    ( 0, 0) : '',
+    ( 0,-1) : '-',
+    (-1, 1) : '/',
+    (-1, 0) : '|',
+    (-1,-1) : '\\'
+  }
 
 # Game Objects
 class Explosion():
@@ -78,6 +92,7 @@ class Shot():
   def __init__(self, x, y, angle, power, owner, conf):
     self.x        = x
     self.y        = y
+    self.tail     = []
     self.speed_x  = power * cos(angle)
     self.speed_y  = power * sin(angle)
     self.age      = 0
@@ -99,9 +114,20 @@ class Shot():
     display_x = clamp(int(self.x), 0, w-1)
     if(self.age>3):
       try:
+        for i,tup in enumerate(self.tail):
+          next = (self.tail + [(display_y, display_x)])[i+1]
+          dif_y = -1 if (next[0] < tup[0]) else (1 if (next[0] > tup[0]) else 0)
+          dif_x = -1 if (next[1] < tup[1]) else (1 if (next[1] > tup[1]) else 0)
+          
+          d = lines()[(dif_y, dif_x)]
+          win.addstr(tup[0], tup[1], choice(['⁙','⁖',d, d]))
         win.addch(display_y, display_x, c)
       except curses.error:
         pass
+    self.tail += [(display_y, display_x)]
+    if(len(self.tail) > self.conf['shot_tail']):
+      self.tail = self.tail[1:]
+
   def despawn(self):
     self.owner.isdone = True
     self.world.gameobjects.remove(self)
