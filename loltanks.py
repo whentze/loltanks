@@ -393,10 +393,12 @@ def confmenu(conf, win):
     win.refresh()
     pad.refresh(max(pos+11 - h, 0), 0, 4, 0, h-7, w-1)
 
-    instructions = curses.newwin(5, w - 20, h - 5, 10)
-    instructions.addstr(1, 1, 'How to play:')
-    instructions.addstr(2, 1, '           Space : Fire          +/- : Adjust Velocity')
-    instructions.addstr(3, 1, '         Up/Down : Aim    Left/Right : Change Direction')
+    instructions = curses.newwin(5, w - 10, h - 5, 5)
+    instructions.addstr(1, int(w/2)-12, 'How to play:')
+    instructions.addstr(2, int(w*0.4)-15, 'Space : Fire ')
+    instructions.addstr(3, int(w*0.4)-15, ' ↑/↓  : Aim')
+    instructions.addstr(2, int(w*0.6)-10,   '+/- : Set Power')
+    instructions.addstr(3, int(w*0.6)-10,   '←/→ : Turn')
     instructions.box()
     instructions.refresh()
 
