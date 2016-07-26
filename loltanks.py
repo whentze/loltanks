@@ -361,13 +361,13 @@ def main(screen):
   curses.curs_set(False)
   width = curses.COLS
   height = curses.LINES
+  
+  if(height < 20 or width < 50):
+    raise RuntimeError("This terminal is too damn small!")
+  
   conf = {}
   for key in default_conf:
     conf[key] = default_conf[key]
-  
-  if(height < 20 or width < 60):
-    print("Your terminal is too damn small!")
-    exit()
   screen.addstr(int(height/2), int((width-len(conf['gamename']))/2), conf['gamename'])
   screen.addstr(int(height/2)+2, int((width-22)/2), 'press any key to play!')
   screen.refresh()
@@ -453,4 +453,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
 try:
   curses.wrapper(main)
 except KeyboardInterrupt:
+  exit()
+except RuntimeError as e:
+  print(str(e))
   exit()
