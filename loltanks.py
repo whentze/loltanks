@@ -252,7 +252,7 @@ class World():
     
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
     self.snow         = int(h*w*conf['snow_max']/100.0)
-    self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,20)] for i in range(self.snow)]
+    self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,80)] for i in range(self.snow)]
     self.ground       = ground
     self.conf         = conf
     self.players      = players
@@ -262,14 +262,14 @@ class World():
     h, w = win.getmaxyx()
     for flake in self.snowflakes:
       flake[0] += self.wind * self.conf['wind_force'] * flake[2]
-      flake[1] += self.conf['gravity'] * flake[2] * 0.5
+      flake[1] += self.conf['gravity'] * flake[2] * 0.2
   
   def draw(self, win):
     # Draw Snow
     h, w = win.getmaxyx()
     for flake in self.snowflakes:
       try:
-        if(flake[2] > 15):
+        if(flake[2] > 60):
           win.addch(int(flake[1]), int(flake[0]), '∗')
         else:
           win.addch(int(flake[1]), int(flake[0]), '·')
@@ -311,7 +311,7 @@ def confmenu(conf, win):
     Menuentry('explosion_damage', 'Shot Damage', conf, range(10,51,10)),
     Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,10)),
     Menuentry('gravity',  'Gravity', conf, [0.001 * i for i in range(50)]),
-    Menuentry('wind_max', 'Wind', conf, range(11)),
+    Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
   ]
   while(1):
@@ -418,14 +418,17 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
   
   # Global Stats
   stats_x = 2 + int(width * len(world.players)/(1+len(world.players)))
-  statuswin.addstr(1, stats_x, "Turn   : {:d}".format(n_turns))
+  statuswin.addstr(1, stats_x, "Turn : {:d}".format(n_turns))
   if(world.wind > 0):
     windstr = ">" * world.wind
   elif(world.wind < 0):
     windstr = "<" * abs(world.wind)
   else:
     windstr = "="
-  statuswin.addstr(2, stats_x, "Wind   : " + windstr)
+  if(len(windstr) < width/(1.0+len(world.players)) - 10):
+    statuswin.addstr(2, stats_x, "Wind : " + windstr)
+  else:
+    statuswin.addstr(2, stats_x, "Wind : " + str(abs(world.wind)) + windstr[0])
   
   # Main Window
   for obj in world.gameobjects:
