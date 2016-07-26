@@ -298,9 +298,11 @@ def main(screen):
   width = curses.COLS
   height = curses.LINES
   conf = default_conf
-  if(height < 18 or width < 40):
-    raise Error("Terminal too small!")
+  if(height < 20 or width < 60):
+    print("Your terminal is too damn small!")
+    exit()
   screen.addstr(int(height/2), int((width-len(conf['gamename']))/2), conf['gamename'])
+  screen.addstr(int(height/2)+2, int((width-22)/2), 'press any key to play!')
   screen.refresh()
   screen.getch()
   
