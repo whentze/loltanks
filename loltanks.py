@@ -188,7 +188,7 @@ class Tank():
       '''  ||_ ''',
       ''' /lol\\''',
       ''' OOOOO''']
-    elif(self.angle <= pi*0.75):
+    elif(self.angle <= pi*0.90):
       self.pic =[
       ''' \\\\__ ''',
       ''' /lol\\''',
