@@ -401,15 +401,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
   h, w = mainwin.getmaxyx()
   mainwin.erase()
   statuswin.erase()
-  try:
-    key = screen.getch()
-  except Error:  
-    pass
   
-  if(not currentplayer.shot_fired):
-    currentplayer.processkey(key)
-  else:
-    mainwin.addstr(1,1,'shots fired!')
   # Status Window
   statuswin.box()
   heigth, width = statuswin.getmaxyx()
@@ -423,6 +415,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     statuswin.addstr(stats_y+1, stats_x, "HP   : {:d}".format(player.health))
     statuswin.addstr(stats_y+2, stats_x, "Angle: {:.1f}°".format(degrees(player.angle)))
     statuswin.addstr(stats_y+3, stats_x, "Power: {:.0%}".format(player.power))
+  
   # Global Stats
   stats_x = 2 + int(width * len(world.players)/(1+len(world.players)))
   statuswin.addstr(1, stats_x, "Turn   : {:d}".format(n_turns))
@@ -433,11 +426,21 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
   else:
     windstr = "="
   statuswin.addstr(2, stats_x, "Wind   : " + windstr)
-  # Main Window
   
+  # Main Window
   for obj in world.gameobjects:
     obj.update(mainwin)
     obj.draw(mainwin)
+  try:
+    key = screen.getch()
+  except Error:  
+    pass
+  
+  if(not currentplayer.shot_fired):
+    currentplayer.processkey(key)
+  else:
+    mainwin.addstr(1,1,'shots fired!')
+  
   mainwin.refresh()
   statuswin.refresh()
   t_end = time.clock()
