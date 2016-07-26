@@ -10,7 +10,7 @@ from random import randint, choice, uniform
 default_conf = {
   'gamename'        : 'loltanks',
   'gravity'         : 10,
-  'sky_min'         : 10,
+  'sky_min'         : 7,
   'ground_min'      : 3,
   'world_border'    : 'Void',
   'players_number'  : 3,
