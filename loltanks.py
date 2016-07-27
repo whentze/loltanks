@@ -527,7 +527,7 @@ def main(screen):
       if (len([p for p in world.players if not p.isdead]) == 0):
         gameover(screen, None)
         break
-    n_turns += 1
+      n_turns += 1
 
 def gameover(screen, winner):
   height, width = screen.getmaxyx()
