@@ -155,13 +155,13 @@ class Shot():
     display_x = clamp(int(self.x), 0, w-1)
     if(self.age>3):
       try:
-        for i,tup in enumerate(self.tail):
-          next = (self.tail + [(display_y, display_x)])[i+1]
-          dif_y = -1 if (next[0] < tup[0]) else (1 if (next[0] > tup[0]) else 0)
-          dif_x = -1 if (next[1] < tup[1]) else (1 if (next[1] > tup[1]) else 0)
-          
-          d = lines()[(dif_y, dif_x)]
-          win.addstr(tup[0], tup[1], choice(['⁙','⁖',d, d]))
+        if(self.x >= 0 and self.x < w and self.y >= 0 and self.y < h):
+          for i,tup in enumerate(self.tail):
+            next = (self.tail + [(display_y, display_x)])[i+1]
+            dif_y = -1 if (next[0] < tup[0]) else (1 if (next[0] > tup[0]) else 0)
+            dif_x = -1 if (next[1] < tup[1]) else (1 if (next[1] > tup[1]) else 0)
+            d = lines()[(dif_y, dif_x)]
+            win.addstr(tup[0], tup[1], choice(['⁙','⁖',d, d]))
         win.addstr(display_y, display_x, c)
       except curses.error:
         pass
