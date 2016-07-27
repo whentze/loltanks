@@ -366,11 +366,11 @@ class World():
             neighbors = (self.ground[x-1][y],
                          self.ground[(x+1)%w][y],
                          self.ground[x][y-1],
-                         self.ground[x][(y+1)%h])
+                         self.ground[x][min(y+1,h-1)])
             diags =(self.ground[x-1][y-1],
                     self.ground[(x+1)%w][y-1],
-                    self.ground[x-1][(y+1)%h],
-                    self.ground[(x+1)%w][(y+1)%h])
+                    self.ground[x-1][min(y+1,h-1)],
+                    self.ground[(x+1)%w][min(y+1,h-1)])
             block = ( not(neighbors[0] and neighbors[2] and diags[0]),
                       not(neighbors[1] and neighbors[2] and diags[1]),
                       not(neighbors[0] and neighbors[3] and diags[2]),
