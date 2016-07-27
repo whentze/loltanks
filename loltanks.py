@@ -216,8 +216,7 @@ class Tank():
     r'OOOOO ']
 
   def draw(self, win):
-    if(self.health <= 0):
-      self.isdead = True
+    if(self.isdead):
       self.pic =[
       '''  ___  ''',
       ''' /rip\ ''',
@@ -276,6 +275,10 @@ class Tank():
   def update(self, win):
     if(all([not self.world.check_collision(xi, self.y+1) for xi in range(self.x-2, self.x+3)])):
       self.y += 1
+    
+    if(self.health <= 0):
+      self.isdead = True
+      self.isdone = True
 
   def processkey(self, key):
     if (key == ord(' ')):
@@ -516,7 +519,7 @@ def main(screen):
                            min( conf['wind_max'], world.wind+conf['wind_change']))
       p.isdone = False
       p.shot_fired = False
-      while (not p.isdone):
+      while (not p.isdone and not len([p for p in world.players if not p.isdead]) <= 1 ):
         gamestep(screen, mainwin, statuswin, p, world, conf, n_turns)
       if (len([p for p in world.players if not p.isdead]) == 1):
         gameover(screen, [p for p in world.players if not p.isdead][0])
