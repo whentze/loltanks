@@ -129,6 +129,7 @@ class World():
                       not(neighbors[1] and neighbors[2] and diags[1]),
                       not(neighbors[0] and neighbors[3] and diags[2]),
                       not(neighbors[1] and neighbors[3] and diags[3]))
+            c = blocks(block)
           elif(self.groundstyle == 'Candy'):
             block = (waves()[0][(x*2  +2*y)%10],
                      waves()[0][(x*2+1+2*y)%10],
