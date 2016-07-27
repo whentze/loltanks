@@ -12,6 +12,7 @@ default_conf = {
   'gravity'         : 10,
   'sky_min'         : 7,
   'ground_min'      : 3,
+  'ground_style'    : 'Snow',
   'world_border'    : 'Void',
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
@@ -46,6 +47,46 @@ def lines():
     (-1, 0) : '|',
     (-1,-1) : '\\'
   }
+
+def pipes(tup):
+  return {
+    ( True , True , True , True ) : '╬',
+    ( True , True , True , False) : '╩',
+    ( True , True , False, True ) : '╦',
+    ( True , True , False, False) : '═',
+    ( True , False, True , True ) : '╣',
+    ( True , False, True , False) : '╝',
+    ( True , False, False, True ) : '╗',
+    ( True , False, False, False) : '╡',
+    ( False, True , True , True ) : '╠',
+    ( False, True , True , False) : '╚',
+    ( False, True , False, True ) : '╔',
+    ( False, True , False, False) : '╞',
+    ( False, False, True , True ) : '║',
+    ( False, False, True , False) : '╨',
+    ( False, False, False, True ) : '╥',
+    ( False, False, False, False) : '◽',
+  }[tup]
+
+def blocks(tup):
+  return {
+    ( True , True , True , True ) : '█',
+    ( True , True , True , False) : '▛',
+    ( True , True , False, True ) : '▜',
+    ( True , True , False, False) : '▀',
+    ( True , False, True , True ) : '▙',
+    ( True , False, True , False) : '▌',
+    ( True , False, False, True ) : '▚',
+    ( True , False, False, False) : '▘',
+    ( False, True , True , True ) : '▟',
+    ( False, True , True , False) : '▞',
+    ( False, True , False, True ) : '▐',
+    ( False, True , False, False) : '▝',
+    ( False, False, True , True ) : '▄',
+    ( False, False, True , False) : '▖',
+    ( False, False, False, True ) : '▗',
+    ( False, False, False, False) : ' ',
+  }[tup]
 
 # Game Objects
 class Explosion():
@@ -292,6 +333,7 @@ class World():
     self.snow         = int(h*w*conf['snow_max']/100.0)
     self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,80)] for i in range(self.snow)]
     self.ground       = ground
+    self.groundstyle  = conf['ground_style']
     self.conf         = conf
     self.players      = players
     self.gameobjects  = gameobjects
@@ -318,8 +360,30 @@ class World():
     for x, col in enumerate(self.ground):
       for y, cell in enumerate(col):
         if(cell):
+          if(self.groundstyle == 'Snow'):
+            c = '█'
+          elif(self.groundstyle == 'Silhouette'):
+            neighbors = (self.ground[x-1][y],
+                         self.ground[(x+1)%w][y],
+                         self.ground[x][y-1],
+                         self.ground[x][(y+1)%h])
+            diags =(self.ground[x-1][y-1],
+                    self.ground[(x+1)%w][y-1],
+                    self.ground[x-1][(y+1)%h],
+                    self.ground[(x+1)%w][(y+1)%h])
+            block = ( not(neighbors[0] and neighbors[2] and diags[0]),
+                      not(neighbors[1] and neighbors[2] and diags[1]),
+                      not(neighbors[0] and neighbors[3] and diags[2]),
+                      not(neighbors[1] and neighbors[3] and diags[3])) 
+            c = blocks(block)
+          elif(self.groundstyle == 'Pipes'):
+            neighbors = (self.ground[x-1][y] or y % 4 == 0,
+                         self.ground[(x+1)%w][y] or y % 4 == 0,
+                         self.ground[x][y-1] or x % 4 == 0,
+                         self.ground[x][(y+1)%h] or x % 4 == 0)
+            c = pipes(neighbors)
           try:
-            win.addstr(y, x, '█')
+            win.addstr(y, x, c)
           except curses.error:
             pass
 
@@ -352,6 +416,7 @@ def confmenu(conf, win):
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
     Menuentry('world_border', 'World Border', conf, ['Void', 'Wall', 'Loop']),
+    Menuentry('ground_style', 'Biome', conf, ['Snow', 'Silhouette', 'Pipes']),
   ]
 
   pad = curses.newpad(2*len(entries) + 3, w)
