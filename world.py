@@ -21,7 +21,7 @@ def pipes(tup):
     ( False, False, True , True ) : '║',
     ( False, False, True , False) : '╨',
     ( False, False, False, True ) : '╥',
-    ( False, False, False, False) : '◽',
+    ( False, False, False, False) : '═',
   }[tup]
 
 def blocks(tup):
@@ -43,6 +43,10 @@ def blocks(tup):
     ( False, False, False, True ) : '▗',
     ( False, False, False, False) : ' ',
   }[tup]
+
+def waves():
+  return [[1,1,1,1,1,0,0,0,0,0],
+          [0,0,0,0,1,1,1,1,1,0]]
 
 class World():
   def __init__(self, win, conf):
@@ -76,6 +80,17 @@ class World():
     self.conf         = conf
     self.players      = players
     self.gameobjects  = gameobjects
+    
+    if(self.groundstyle == 'Candy'):
+      # pink
+      curses.init_color(101, 1000,  300,  800)
+      # purple
+      curses.init_color(102,  800,    0,  600)
+      # candy 
+      curses.init_pair(7, 101, 102)
+      self.groundcolor = curses.color_pair(7)
+    else:
+      self.groundcolor = curses.color_pair(0)
 
   def update(self, win):
     h, w = win.getmaxyx()
@@ -99,7 +114,7 @@ class World():
     for x, col in enumerate(self.ground):
       for y, cell in enumerate(col):
         if(cell):
-          if(self.groundstyle == 'Snow'):
+          if(self.groundstyle == 'Block'):
             c = '█'
           elif(self.groundstyle == 'Silhouette'):
             neighbors = (self.ground[x-1][y],
@@ -113,7 +128,12 @@ class World():
             block = ( not(neighbors[0] and neighbors[2] and diags[0]),
                       not(neighbors[1] and neighbors[2] and diags[1]),
                       not(neighbors[0] and neighbors[3] and diags[2]),
-                      not(neighbors[1] and neighbors[3] and diags[3])) 
+                      not(neighbors[1] and neighbors[3] and diags[3]))
+          elif(self.groundstyle == 'Candy'):
+            block = (waves()[0][(x*2  +2*y)%10],
+                     waves()[0][(x*2+1+2*y)%10],
+                     waves()[1][(x*2  +2*y)%10],
+                     waves()[1][(x*2+1+2*y)%10])
             c = blocks(block)
           elif(self.groundstyle == 'Pipes'):
             neighbors = (self.ground[x-1][y] or y % 4 == 0,
@@ -122,7 +142,7 @@ class World():
                          self.ground[x][(y+1)%h] or x % 4 == 0)
             c = pipes(neighbors)
           try:
-            win.addstr(y, x, c)
+            win.addstr(y, x, c, self.groundcolor)
           except curses.error:
             pass
 

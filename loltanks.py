@@ -28,7 +28,7 @@ default_conf = {
   'gravity'         : 10,
   'sky_min'         : 7,
   'ground_min'      : 3,
-  'ground_style'    : 'Snow',
+  'ground_style'    : 'Block',
   'world_border'    : 'Void',
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
@@ -65,7 +65,7 @@ def confmenu(conf, win):
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
     Menuentry('world_border', 'World Border', conf, ['Void', 'Wall', 'Loop']),
-    Menuentry('ground_style', 'Biome', conf, ['Snow', 'Silhouette', 'Pipes']),
+    Menuentry('ground_style', 'Biome', conf, ['Block', 'Silhouette', 'Candy', 'Pipes']),
   ]
 
   pad = curses.newpad(2*len(entries) + 3, w)
