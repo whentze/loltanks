@@ -598,6 +598,9 @@ try:
   curses.wrapper(main)
 except KeyboardInterrupt:
   exit()
+except curses.error:
+  print("Please don't resize the window!")
+  exit()
 except RuntimeError as e:
   print(str(e))
   exit()
