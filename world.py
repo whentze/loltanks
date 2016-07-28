@@ -122,8 +122,8 @@ class World():
 
   def destroy_ground(self, x, y):
     self.ground[x][y] = False
-    for xi in range(max(0, x-1), min(len(self.ground)-1, x+2)):
-      for yi in range(max(0, y-1), min(len(self.ground[0])-1, y+2)):
+    for xi in range(max(0, x-1), min(len(self.ground), x+2)):
+      for yi in range(max(0, y-1), min(len(self.ground[0]), y+2)):
         self.paint(xi, yi)
 
   def paint(self, x, y):
