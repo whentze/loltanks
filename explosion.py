@@ -37,7 +37,7 @@ class Explosion():
           display_x = clamp(int(self.x + cos(radians(theta)) * i), 0, w)
         display_y = clamp(int(self.y - sin(radians(theta)) * i), 0, h)
         if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
-          self.world.ground[display_x][display_y] = False
+          self.world.destroy_ground(display_x, display_y)
         try:
           win.addstr(display_y, display_x, '#')
         except curses.error:

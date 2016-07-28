@@ -55,10 +55,15 @@ class World():
           levels[-1] + choice([0,0,-1,1]),
           conf['sky_min'],
           h - conf['ground_min'])]
-    
     for x in range(w):
       for y in range(h):
         ground[x][y] = levels[x] < y
+    self.ground = ground
+    self.groundchars =  [['█']                 *h for x in range(w)]
+    self.groundstyle  = conf['ground_style']
+    for x in range(w):
+      for y in range(h):
+        self.paint(x, y)
 
     gameobjects = [self]
     players     = []
@@ -70,10 +75,9 @@ class World():
       gameobjects += [newplayer]
 
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
+    
     self.snow         = int(h*w*conf['snow_max']/100.0)
     self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,80)] for i in range(self.snow)]
-    self.ground       = ground
-    self.groundstyle  = conf['ground_style']
     self.conf         = conf
     self.players      = players
     self.gameobjects  = gameobjects
@@ -111,38 +115,49 @@ class World():
     for x, col in enumerate(self.ground):
       for y, cell in enumerate(col):
         if(cell):
-          if(self.groundstyle == 'Block'):
-            c = '█'
-          elif(self.groundstyle == 'Silhouette'):
-            neighbors = (self.ground[x-1][y],
-                         self.ground[(x+1)%w][y],
-                         self.ground[x][y-1],
-                         self.ground[x][min(y+1,h-1)])
-            diags =(self.ground[x-1][y-1],
-                    self.ground[(x+1)%w][y-1],
-                    self.ground[x-1][min(y+1,h-1)],
-                    self.ground[(x+1)%w][min(y+1,h-1)])
-            block = ( not(neighbors[0] and neighbors[2] and diags[0]),
-                      not(neighbors[1] and neighbors[2] and diags[1]),
-                      not(neighbors[0] and neighbors[3] and diags[2]),
-                      not(neighbors[1] and neighbors[3] and diags[3]))
-            c = blocks[block]
-          elif(self.groundstyle == 'Candy'):
-            block = (waves[0][(x*2  +2*y)%10],
-                     waves[0][(x*2+1+2*y)%10],
-                     waves[1][(x*2  +2*y)%10],
-                     waves[1][(x*2+1+2*y)%10])
-            c = blocks[block]
-          elif(self.groundstyle == 'Pipes'):
-            neighbors = (self.ground[x-1][y] or y % 4 == 0,
-                         self.ground[(x+1)%w][y] or y % 4 == 0,
-                         self.ground[x][y-1] or x % 4 == 0,
-                         self.ground[x][(y+1)%h] or x % 4 == 0)
-            c = pipes[neighbors]
           try:
-            win.addstr(y, x, c, self.groundcolor)
+            win.addch(y, x, self.groundchars[x][y], self.groundcolor)
           except curses.error:
             pass
+
+  def destroy_ground(self, x, y):
+    self.ground[x][y] = False
+    for xi in range(max(0, x-1), min(len(self.ground)-1, x+2)):
+      for yi in range(max(0, y-1), min(len(self.ground[0])-1, y+2)):
+        self.paint(xi, yi)
+
+  def paint(self, x, y):
+    if(self.ground[x][y]):
+      h, w = len(self.ground[0]), len(self.ground)
+      if(self.groundstyle == 'Block'):
+        c = '█'
+      elif(self.groundstyle == 'Silhouette'):
+        neighbors = (self.ground[x-1][y],
+                     self.ground[(x+1)%w][y],
+                     self.ground[x][y-1],
+                     self.ground[x][min(y+1,h-1)])
+        diags =(self.ground[x-1][y-1],
+                self.ground[(x+1)%w][y-1],
+                self.ground[x-1][min(y+1,h-1)],
+                self.ground[(x+1)%w][min(y+1,h-1)])
+        block = ( not(neighbors[0] and neighbors[2] and diags[0]),
+                  not(neighbors[1] and neighbors[2] and diags[1]),
+                  not(neighbors[0] and neighbors[3] and diags[2]),
+                  not(neighbors[1] and neighbors[3] and diags[3]))
+        c = blocks[block]
+      elif(self.groundstyle == 'Candy'):
+        block = (waves[0][(x*2  +2*y)%10],
+                 waves[0][(x*2+1+2*y)%10],
+                 waves[1][(x*2  +2*y)%10],
+                 waves[1][(x*2+1+2*y)%10])
+        c = blocks[block]
+      elif(self.groundstyle == 'Pipes'):
+        neighbors = (self.ground[x-1][y] or y % 4 == 0,
+                     self.ground[(x+1)%w][y] or y % 4 == 0,
+                     self.ground[x][y-1] or x % 4 == 0,
+                     self.ground[x][(y+1)%h] or x % 4 == 0)
+        c = pipes[neighbors]
+      self.groundchars[x][y] = c
 
   def check_collision(self, x, y):
     if (y >= len(self.ground[0])):
