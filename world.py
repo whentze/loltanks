@@ -4,8 +4,7 @@ import curses
 from util import clamp
 from tank import Tank
 
-def pipes(tup):
-  return {
+pipes = {
     ( True , True , True , True ) : '╬',
     ( True , True , True , False) : '╩',
     ( True , True , False, True ) : '╦',
@@ -22,10 +21,9 @@ def pipes(tup):
     ( False, False, True , False) : '╨',
     ( False, False, False, True ) : '╥',
     ( False, False, False, False) : '═',
-  }[tup]
+  }
 
-def blocks(tup):
-  return {
+blocks = {
     ( True , True , True , True ) : '█',
     ( True , True , True , False) : '▛',
     ( True , True , False, True ) : '▜',
@@ -42,11 +40,10 @@ def blocks(tup):
     ( False, False, True , False) : '▖',
     ( False, False, False, True ) : '▗',
     ( False, False, False, False) : ' ',
-  }[tup]
+  }
 
-def waves():
-  return [[1,1,1,1,1,0,0,0,0,0],
-          [0,0,0,0,1,1,1,1,1,0]]
+waves =[[1,1,1,1,1,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,0]]
 
 class World():
   def __init__(self, win, conf):
@@ -129,19 +126,19 @@ class World():
                       not(neighbors[1] and neighbors[2] and diags[1]),
                       not(neighbors[0] and neighbors[3] and diags[2]),
                       not(neighbors[1] and neighbors[3] and diags[3]))
-            c = blocks(block)
+            c = blocks[block]
           elif(self.groundstyle == 'Candy'):
-            block = (waves()[0][(x*2  +2*y)%10],
-                     waves()[0][(x*2+1+2*y)%10],
-                     waves()[1][(x*2  +2*y)%10],
-                     waves()[1][(x*2+1+2*y)%10])
-            c = blocks(block)
+            block = (waves[0][(x*2  +2*y)%10],
+                     waves[0][(x*2+1+2*y)%10],
+                     waves[1][(x*2  +2*y)%10],
+                     waves[1][(x*2+1+2*y)%10])
+            c = blocks[block]
           elif(self.groundstyle == 'Pipes'):
             neighbors = (self.ground[x-1][y] or y % 4 == 0,
                          self.ground[(x+1)%w][y] or y % 4 == 0,
                          self.ground[x][y-1] or x % 4 == 0,
                          self.ground[x][(y+1)%h] or x % 4 == 0)
-            c = pipes(neighbors)
+            c = pipes[neighbors]
           try:
             win.addstr(y, x, c, self.groundcolor)
           except curses.error:
