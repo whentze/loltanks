@@ -120,13 +120,14 @@ class World():
         flake[0] = flake[0]%w
         flake[1] = flake[1]%h
     # Draw Ground
-    for x, col in enumerate(self.ground):
-      for y, cell in enumerate(col):
-        if(cell):
-          try:
-            win.addch(y, x, self.groundchars[x][y], self.groundcolor)
-          except curses.error:
-            pass
+    try:
+      for x, col in enumerate(self.ground):
+        for y, cell in enumerate(col):
+          if(cell):
+              win.addch(y, x, self.groundchars[x][y], self.groundcolor)
+    except curses.error:
+      # The very last character will error so except only once
+      pass
 
   def destroy_ground(self, x, y):
     self.ground[x][y] = False
