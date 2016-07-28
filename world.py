@@ -82,7 +82,15 @@ class World():
     self.players      = players
     self.gameobjects  = gameobjects
     
-    if(self.groundstyle == 'Candy'):
+    if(self.groundstyle == 'Dirt'):
+      # brown
+      curses.init_color(101,  300,  200,  100)
+      # green
+      curses.init_color(102,  400,  700,  100)
+      # dirt/grass
+      curses.init_pair(7, 101, 102)
+      self.groundcolor = curses.color_pair(7)
+    elif(self.groundstyle == 'Candy'):
       # pink
       curses.init_color(101, 1000,  300,  800)
       # purple
@@ -122,16 +130,17 @@ class World():
 
   def destroy_ground(self, x, y):
     self.ground[x][y] = False
-    for xi in range(max(0, x-1), min(len(self.ground), x+2)):
-      for yi in range(max(0, y-1), min(len(self.ground[0]), y+2)):
-        self.paint(xi, yi)
+    if(self.groundstyle in ['Silhouette', 'Pipes']):
+      for xi in range(max(0, x-1), min(len(self.ground), x+2)):
+        for yi in range(max(0, y-1), min(len(self.ground[0]), y+2)):
+          self.paint(xi, yi)
 
   def paint(self, x, y):
     if(self.ground[x][y]):
       h, w = len(self.ground[0]), len(self.ground)
       if(self.groundstyle == 'Block'):
         c = '█'
-      elif(self.groundstyle == 'Silhouette'):
+      elif(self.groundstyle in ['Silhouette', 'Dirt']):
         neighbors = (self.ground[x-1][y],
                      self.ground[(x+1)%w][y],
                      self.ground[x][y-1],
@@ -144,7 +153,10 @@ class World():
                   not(neighbors[1] and neighbors[2] and diags[1]),
                   not(neighbors[0] and neighbors[3] and diags[2]),
                   not(neighbors[1] and neighbors[3] and diags[3]))
-        c = blocks[block]
+        if(self.groundstyle == 'Silhouette'):
+          c = blocks[block]
+        elif(self.groundstyle == 'Dirt'):
+          c = ['█', '▓', '▒', '░', ' '][len([b for b in block if b])]
       elif(self.groundstyle == 'Candy'):
         block = (waves[0][(x*2  +2*y)%10],
                  waves[0][(x*2+1+2*y)%10],
