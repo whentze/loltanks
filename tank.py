@@ -4,6 +4,8 @@ import curses
 from util import clamp
 from shot import Shot
 
+tanksize = 2
+
 class Tank():
   def __init__(self, x, y, name, colors, world, conf):
     self.x          = x
@@ -60,7 +62,7 @@ class Tank():
       '''  ___ ''',
       '''=/lol\\''',
       ''' OOOOO''']
-    display_y = self.y - 2
+    display_y = self.y - tanksize
     display_x = self.x - int(max([len(line) for line in self.pic])/2)
     # Draw Crosshair
     if (not self.isdone):
@@ -82,7 +84,9 @@ class Tank():
     win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
 
   def update(self, win):
-    if(all([not self.world.check_collision(xi, self.y+1) for xi in range(self.x-2, self.x+3)])):
+    if(all(
+        [not self.world.check_collision(xi, self.y+1) for xi in
+            range(self.x-tanksize, self.x+tanksize+1)])):
       self.y += 1
     
     if(self.health <= 0):
@@ -113,6 +117,11 @@ class Tank():
       self.power = max(0.00, self.power-0.01)
     return False
   def shoot(self):
-    shot = Shot(self.x, self.y, self.angle, self.power*self.conf['tank_power'], self, self.conf)
+    shot = Shot(self.x + tanksize*cos(self.angle),
+                self.y - tanksize*sin(self.angle),
+                self.angle,
+                self.power*self.conf['tank_power'],
+                self,
+                self.conf)
     self.world.gameobjects += [shot]
     self.shot_fired = True
