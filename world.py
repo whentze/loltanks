@@ -5,44 +5,6 @@ from util import clamp
 from tank import Tank
 import blockgraphics
 
-pipes = {
-    ( True , True , True , True ) : '╬',
-    ( True , True , True , False) : '╩',
-    ( True , True , False, True ) : '╦',
-    ( True , True , False, False) : '═',
-    ( True , False, True , True ) : '╣',
-    ( True , False, True , False) : '╝',
-    ( True , False, False, True ) : '╗',
-    ( True , False, False, False) : '╡',
-    ( False, True , True , True ) : '╠',
-    ( False, True , True , False) : '╚',
-    ( False, True , False, True ) : '╔',
-    ( False, True , False, False) : '╞',
-    ( False, False, True , True ) : '║',
-    ( False, False, True , False) : '╨',
-    ( False, False, False, True ) : '╥',
-    ( False, False, False, False) : '═',
-  }
-
-blocks = {
-    ( True , True , True , True ) : '█',
-    ( True , True , True , False) : '▛',
-    ( True , True , False, True ) : '▜',
-    ( True , True , False, False) : '▀',
-    ( True , False, True , True ) : '▙',
-    ( True , False, True , False) : '▌',
-    ( True , False, False, True ) : '▚',
-    ( True , False, False, False) : '▘',
-    ( False, True , True , True ) : '▟',
-    ( False, True , True , False) : '▞',
-    ( False, True , False, True ) : '▐',
-    ( False, True , False, False) : '▝',
-    ( False, False, True , True ) : '▄',
-    ( False, False, True , False) : '▖',
-    ( False, False, False, True ) : '▗',
-    ( False, False, False, False) : ' ',
-  }
-
 waves =[[1,1,1,1,1,0,0,0,0,0],
         [0,0,0,0,1,1,1,1,1,0]]
 
