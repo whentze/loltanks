@@ -45,8 +45,11 @@ class World():
 
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
     
-    self.snow         = int(h*w*conf['snow_max']/100.0)
-    self.snowflakes   = [[uniform(0,w-1),uniform(0,h-1),uniform(1,80)] for i in range(self.snow)]
+    # init particles
+    partcount         = int(h*w*conf['particles_max']/200.0)
+    self.particles    = [[uniform(0,w-1),uniform(0,h-1),uniform(20,80)]
+        for i in range(partcount)]
+
     self.conf         = conf
     self.players      = players
     self.gameobjects  = gameobjects
@@ -80,23 +83,46 @@ class World():
 
   def update(self, win):
     h, w = win.getmaxyx()
-    for flake in self.snowflakes:
-      flake[0] += self.wind * self.conf['wind_force'] * flake[2]
-      flake[1] += self.conf['gravity'] * flake[2] * 0.0002
+    for part in self.particles:
+      if(self.conf['particles_type'] == 'Snow'):
+        part[0] += self.wind * self.conf['wind_force'] * part[2]
+        part[1] += self.conf['gravity'] * part[2] * 0.0002
+      if(self.conf['particles_type'] == 'Rain'):
+        part[0] += self.wind * self.conf['wind_force'] * part[2]
+        part[1] += self.conf['gravity']  * part[2] * 0.001
 
   def draw(self, win):
-    # Draw Snow
     h, w = win.getmaxyx()
     win.bkgdset(' ', self.skycolor)
-    for flake in self.snowflakes:
+    # Draw Particles
+    parttype = self.conf['particles_type']
+    for part in self.particles:
+      part[0] = part[0]%w
+      part[1] = part[1]%h
       try:
-        if(flake[2] > 60):
-          win.addstr(int(flake[1]), int(flake[0]), '∗')
-        else:
-          win.addstr(int(flake[1]), int(flake[0]), '·')
+        if(parttype == 'Snow'):
+          if(part[2] > 60):
+            win.addstr(int(part[1]), int(part[0]), '∗')
+          else:
+            win.addstr(int(part[1]), int(part[0]), '·')
+        elif(parttype == 'Rain'):
+          win.addstr(int(part[1]), int(part[0]), '|', curses.color_pair(2))
+        elif(parttype == 'Stars'):
+          if(randint(0, 200) == 0):
+            if(part[2] > 60):
+              win.addstr(int(part[1]), int(part[0]), '◆')
+            else:
+              win.addstr(int(part[1]), int(part[0]), '✦')
+          else:
+            if(part[2] > 60):
+              win.addstr(int(part[1]), int(part[0]), '٭')
+            elif(part[2] > 40):
+              win.addstr(int(part[1]), int(part[0]), '·')
+            else:
+              win.addstr(int(part[1]), int(part[0]), '･')
       except curses.error:
-        flake[0] = flake[0]%w
-        flake[1] = flake[1]%h
+        pass
+
     # Draw Ground
     try:
       for x, col in enumerate(self.ground):

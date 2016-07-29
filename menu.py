@@ -22,7 +22,8 @@ def confmenu(conf, win):
     Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,11)),
     Menuentry('gravity',  'Gravity', conf, range(51)),
     Menuentry('wind_max', 'Wind', conf, range(21)),
-    Menuentry('snow_max', 'Snow', conf, range(11)),
+    Menuentry('particles_type', 'Particle Type', conf, ['Snow', 'Rain', 'Stars']),
+    Menuentry('particles_max', 'Particle Amount', conf, range(11)),
     Menuentry('world_border', 'World Border', conf, ['Void', 'Wall', 'Loop']),
     Menuentry('world_style', 'Biome', conf, ['Block', 'Silhouette', 'Dirt', 'Candy', 'Pipes']),
   ]
