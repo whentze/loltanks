@@ -3,6 +3,7 @@ import curses
 
 from util import clamp
 from tank import Tank
+import blockgraphics
 
 pipes = {
     ( True , True , True , True ) : '╬',
@@ -155,7 +156,7 @@ class World():
                   not(neighbors[0] and neighbors[3] and diags[2]),
                   not(neighbors[1] and neighbors[3] and diags[3]))
         if(self.groundstyle == 'Silhouette'):
-          c = blocks[block]
+          c = blockgraphics.blocks[block]
         elif(self.groundstyle == 'Dirt'):
           c = ['█', '▓', '▒', '░', ' '][len([b for b in block if b])]
       elif(self.groundstyle == 'Candy'):
@@ -163,13 +164,13 @@ class World():
                  waves[0][(x*2+1+2*y)%10],
                  waves[1][(x*2  +2*y)%10],
                  waves[1][(x*2+1+2*y)%10])
-        c = blocks[block]
+        c = blockgraphics.blocks[block]
       elif(self.groundstyle == 'Pipes'):
-        neighbors = (self.ground[x-1][y] or y % 4 == 0,
-                     self.ground[(x+1)%w][y] or y % 4 == 0,
-                     self.ground[x][y-1] or x % 4 == 0,
+        neighbors = (self.ground[x][y-1] or y % 4 == 0,
+                     self.ground[x-1][y] or y % 4 == 0,
+                     self.ground[(x+1)%w][y] or x % 4 == 0,
                      self.ground[x][(y+1)%h] or x % 4 == 0)
-        c = pipes[neighbors]
+        c = blockgraphics.pipes[neighbors]
       self.groundchars[x][y] = c
 
   def check_collision(self, x, y):
