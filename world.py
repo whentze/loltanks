@@ -142,7 +142,7 @@ class World():
       h, w = len(self.ground[0]), len(self.ground)
       if(self.groundstyle == 'Block'):
         c = '█'
-      elif(self.groundstyle in ['Silhouette', 'Dirt']):
+      elif(self.groundstyle == 'Silhouette'):
         neighbors = (self.ground[x-1][y],
                      self.ground[(x+1)%w][y],
                      self.ground[x][y-1],
@@ -155,11 +155,10 @@ class World():
                   not(neighbors[1] and neighbors[2] and diags[1]),
                   not(neighbors[0] and neighbors[3] and diags[2]),
                   not(neighbors[1] and neighbors[3] and diags[3]))
-        if(self.groundstyle == 'Silhouette'):
-          c = blockgraphics.blocks[block]
-        elif(self.groundstyle == 'Dirt'):
-          grass = clamp(max([0]+[y-yi for yi in range(0, y) if self.ground[x][yi]]), 0, 4)
-          c = ['█', '▓', '▒', '░', ' '][grass]
+        c = blockgraphics.blocks[block]
+      elif(self.groundstyle == 'Dirt'):
+        grass = clamp(max([0]+[y-yi for yi in range(0, y) if self.ground[x][yi]]), 0, 4)
+        c = ['█', '▓', '▒', '░', ' '][grass]
       elif(self.groundstyle == 'Candy'):
         block = (waves[0][(x*2  +2*y)%10],
                  waves[0][(x*2+1+2*y)%10],
