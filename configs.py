@@ -5,7 +5,7 @@ default_conf = {
   'gravity'         : 10,
   'sky_min'         : 7,
   'ground_min'      : 3,
-  'ground_style'    : 'Block',
+  'world_style'     : 'Block',
   'world_border'    : 'Void',
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],

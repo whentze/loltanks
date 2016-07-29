@@ -24,7 +24,7 @@ def confmenu(conf, win):
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('snow_max', 'Snow', conf, range(11)),
     Menuentry('world_border', 'World Border', conf, ['Void', 'Wall', 'Loop']),
-    Menuentry('ground_style', 'Biome', conf, ['Block', 'Silhouette', 'Dirt', 'Candy', 'Pipes']),
+    Menuentry('world_style', 'Biome', conf, ['Block', 'Silhouette', 'Dirt', 'Candy', 'Pipes']),
   ]
 
   pad = curses.newpad(2*len(entries) + 3, w)

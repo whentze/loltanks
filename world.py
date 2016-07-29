@@ -8,6 +8,12 @@ import blockgraphics
 waves =[[1,1,1,1,1,0,0,0,0,0],
         [0,0,0,0,1,1,1,1,1,0]]
 
+GROUNDFG   = 101
+GROUNDBG   = 102
+GROUNDPAIR = 7
+SKYBG      = 103
+SKYPAIR    = 8
+
 class World():
   def __init__(self, win, conf):
     h, w = win.getmaxyx()
@@ -23,7 +29,7 @@ class World():
         ground[x][y] = levels[x] < y
     self.ground = ground
     self.groundchars =  [['█']                 *h for x in range(w)]
-    self.groundstyle  = conf['ground_style']
+    self.style  = conf['world_style']
     for x in range(w):
       for y in range(h):
         self.paint(x, y)
@@ -31,7 +37,7 @@ class World():
     gameobjects = [self]
     players     = []
     for i in range(conf['players_number']):
-      curses.init_pair(i+1, conf['players_colors'][i], curses.COLOR_BLACK)
+      curses.init_pair(i+1, conf['players_colors'][i], SKYBG)
       x = int(w*(i+1.0)/(conf['players_number']+1))
       newplayer = Tank(x, min(levels[x-2:x+3]), "Player {:d}".format(i+1), i+1, self, conf)
       players += [newplayer]
@@ -45,24 +51,32 @@ class World():
     self.players      = players
     self.gameobjects  = gameobjects
     
-    if(self.groundstyle == 'Dirt'):
+    if(self.style == 'Dirt'):
       # green
-      curses.init_color(101,  400,  700,  100)
+      curses.init_color(GROUNDFG,  400,  700,  100)
       # brown
-      curses.init_color(102,  300,  200,  100)
-      # dirt/grass
-      curses.init_pair(7, 101, 102)
-      self.groundcolor = curses.color_pair(7)
-    elif(self.groundstyle == 'Candy'):
+      curses.init_color(GROUNDBG,  300,  200,  100)
+      # dark blue
+      curses.init_color(SKYBG,       0,    0,  150)
+    elif(self.style == 'Candy'):
       # pink
-      curses.init_color(101, 1000,  300,  800)
+      curses.init_color(GROUNDFG, 1000,  300,  800)
       # purple
-      curses.init_color(102,  800,    0,  600)
-      # candy 
-      curses.init_pair(7, 101, 102)
-      self.groundcolor = curses.color_pair(7)
+      curses.init_color(GROUNDBG,  800,    0,  600)
+      # dark blue
+      curses.init_color(SKYBG,       0,    0,    0)
     else:
-      self.groundcolor = curses.color_pair(0)
+      # white
+      curses.init_color(GROUNDFG, 1000, 1000, 1000)
+      # black
+      curses.init_color(GROUNDBG,    0,    0,    0)
+      # dark blue
+      curses.init_color(SKYBG,       0,    0,    0)
+
+    curses.init_pair(GROUNDPAIR, GROUNDFG, GROUNDBG)
+    self.groundcolor = curses.color_pair(GROUNDPAIR)
+    curses.init_pair(SKYPAIR, curses.COLOR_WHITE, SKYBG)
+    self.skycolor = curses.color_pair(SKYPAIR)
 
   def update(self, win):
     h, w = win.getmaxyx()
@@ -73,6 +87,7 @@ class World():
   def draw(self, win):
     # Draw Snow
     h, w = win.getmaxyx()
+    win.bkgdset(' ', self.skycolor)
     for flake in self.snowflakes:
       try:
         if(flake[2] > 60):
@@ -94,7 +109,7 @@ class World():
 
   def destroy_ground(self, x, y):
     self.ground[x][y] = False
-    if(self.groundstyle in ['Silhouette', 'Pipes']):
+    if(self.style in ['Silhouette', 'Pipes']):
       for xi in range(max(0, x-1), min(len(self.ground), x+2)):
         for yi in range(max(0, y-1), min(len(self.ground[0]), y+2)):
           self.paint(xi, yi)
@@ -102,9 +117,9 @@ class World():
   def paint(self, x, y):
     if(self.ground[x][y]):
       h, w = len(self.ground[0]), len(self.ground)
-      if(self.groundstyle == 'Block'):
+      if(self.style == 'Block'):
         c = '█'
-      elif(self.groundstyle == 'Silhouette'):
+      elif(self.style == 'Silhouette'):
         neighbors = (self.ground[x-1][y],
                      self.ground[(x+1)%w][y],
                      self.ground[x][y-1],
@@ -118,16 +133,16 @@ class World():
                   not(neighbors[0] and neighbors[3] and diags[2]),
                   not(neighbors[1] and neighbors[3] and diags[3]))
         c = blockgraphics.blocks[block]
-      elif(self.groundstyle == 'Dirt'):
+      elif(self.style == 'Dirt'):
         grass = clamp(max([0]+[y-yi for yi in range(0, y) if self.ground[x][yi]]), 0, 4)
         c = ['█', '▓', '▒', '░', ' '][grass]
-      elif(self.groundstyle == 'Candy'):
+      elif(self.style == 'Candy'):
         block = (waves[0][(x*2  +2*y)%10],
                  waves[0][(x*2+1+2*y)%10],
                  waves[1][(x*2  +2*y)%10],
                  waves[1][(x*2+1+2*y)%10])
         c = blockgraphics.blocks[block]
-      elif(self.groundstyle == 'Pipes'):
+      elif(self.style == 'Pipes'):
         neighbors = (self.ground[x][y-1] or y % 4 == 0,
                      self.ground[x-1][y] or y % 4 == 0,
                      self.ground[(x+1)%w][y] or x % 4 == 0,
