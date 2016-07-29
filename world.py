@@ -84,10 +84,10 @@ class World():
     self.gameobjects  = gameobjects
     
     if(self.groundstyle == 'Dirt'):
-      # brown
-      curses.init_color(101,  300,  200,  100)
       # green
-      curses.init_color(102,  400,  700,  100)
+      curses.init_color(101,  400,  700,  100)
+      # brown
+      curses.init_color(102,  300,  200,  100)
       # dirt/grass
       curses.init_pair(7, 101, 102)
       self.groundcolor = curses.color_pair(7)
@@ -158,7 +158,8 @@ class World():
         if(self.groundstyle == 'Silhouette'):
           c = blockgraphics.blocks[block]
         elif(self.groundstyle == 'Dirt'):
-          c = ['█', '▓', '▒', '░', ' '][len([b for b in block if b])]
+          grass = clamp(max([0]+[y-yi for yi in range(0, y) if self.ground[x][yi]]), 0, 4)
+          c = ['█', '▓', '▒', '░', ' '][grass]
       elif(self.groundstyle == 'Candy'):
         block = (waves[0][(x*2  +2*y)%10],
                  waves[0][(x*2+1+2*y)%10],
