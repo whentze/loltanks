@@ -63,14 +63,14 @@ class World():
       curses.init_color(GROUNDFG, 1000,  300,  800)
       # purple
       curses.init_color(GROUNDBG,  800,    0,  600)
-      # dark blue
+      # black
       curses.init_color(SKYBG,       0,    0,    0)
     else:
       # white
       curses.init_color(GROUNDFG, 1000, 1000, 1000)
       # black
       curses.init_color(GROUNDBG,    0,    0,    0)
-      # dark blue
+      # black
       curses.init_color(SKYBG,       0,    0,    0)
 
     curses.init_pair(GROUNDPAIR, GROUNDFG, GROUNDBG)
