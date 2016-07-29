@@ -117,8 +117,8 @@ class Tank():
       self.power = max(0.00, self.power-0.01)
     return False
   def shoot(self):
-    shot = Shot(self.x + tanksize*cos(self.angle),
-                self.y - tanksize*sin(self.angle),
+    shot = Shot(self.x + (1+tanksize)*cos(self.angle),
+                self.y - (1+tanksize)*sin(self.angle),
                 self.angle,
                 self.power*self.conf['tank_power'],
                 self,

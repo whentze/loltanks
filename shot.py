@@ -75,7 +75,8 @@ class Shot():
     if (self.y > h):
       self.despawn()
       return
-    elif (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y) or self.age > 7 and min([dist(self, p) for p in self.world.players]) < 2):
+    elif (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y)
+        or min([dist(self, p) for p in self.world.players]) < 2):
       self.explode()
       return
     self.x += self.speed_x
