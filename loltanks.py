@@ -22,27 +22,7 @@ from random import randint, choice, uniform
 from util import clamp, dist
 from world import World
 from tank import Tank
-
-default_conf = {
-  'gamename'        : 'loltanks',
-  'gravity'         : 10,
-  'sky_min'         : 7,
-  'ground_min'      : 3,
-  'ground_style'    : 'Block',
-  'world_border'    : 'Void',
-  'players_number'  : 3,
-  'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
-  'tank_health'     : 100,
-  'tank_power'      : 1.5,
-  'wind_max'        : 5,
-  'wind_change'     : 2,
-  'wind_force'      : 0.0010,
-  'snow_max'        : 1.0,
-  'explosion_damage': 30,
-  'explosion_radius': 5,
-  'shot_age'        : 500,
-  'shot_tail'        : 7,
-}
+import configs
 
 class Menuentry():
   def __init__(self, key, name, conf, possible_values):
@@ -144,7 +124,7 @@ def main(screen):
   if(height < 20 or width < 50):
     raise RuntimeError("This terminal is too damn small!")
 
-  conf = default_conf
+  conf = configs.default_conf
   confmenu(conf, screen)
 
   screen.nodelay(True)
