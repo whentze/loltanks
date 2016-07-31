@@ -36,7 +36,7 @@ def main(screen):
   if(height < 20 or width < 50):
     raise RuntimeError("This terminal is too damn small!")
 
-  conf = configs.default_conf
+  conf = configs.nice_conf
   menu.confmenu(conf, screen)
 
   screen.nodelay(True)
