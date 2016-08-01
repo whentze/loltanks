@@ -1,4 +1,4 @@
-from math import sin, cos
+from math import sin, cos, atan2, radians
 from random import choice
 import curses
 
@@ -104,3 +104,35 @@ class Drill_shot(Shot):
     self.explosions -= 1
     if(self.explosions == 0):
       self.despawn()
+
+class Teleporter(Shot):
+  char = '🌀'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+  def explode(self):
+    self.owner.x, self.owner.y = int(self.x), int(self.y)-2
+    self.despawn()
+
+class Dirt_wedge(Shot):
+  char = '⛏'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+    self.wedge_points = []
+    self.angle = angle
+    self.x, self.y = self.world.moveby(self.x, self.y, -3*cos(angle), 3*sin(angle))
+  def update(self, win):
+    self.age += 1
+    for i in range(2*self.age):
+      angle = self.angle + radians(25 * (-1 + i/self.age))
+      x,y = self.world.moveby(self.x, self.y, cos(angle)*self.age, -sin(angle)*self.age)
+      self.wedge_points += [(int(x), int(y))]
+      self.world.destroy_ground(int(x), int(y))
+    if(self.age >= 10):
+      self.despawn()
+  def draw(self, win):
+    h, w = win.getmaxyx()
+    for (x, y) in self.wedge_points:
+      win.addch(y, x, '🞿')
+  def explode(self):
+    self.owner.x, self.owner.y = int(self.x), int(self.y)-3
+    self.despawn()
