@@ -42,6 +42,7 @@ class World():
     self.ground = ground
     self.groundchars =  [['█']                 *h for x in range(w)]
     self.style  = conf['world_style']
+    self.border = conf['world_border']
     for x in range(w):
       for y in range(h):
         self.paint(x, y)
@@ -191,7 +192,19 @@ class World():
   def check_collision(self, x, y):
     if (y >= len(self.ground[0])):
       return True
-    elif(x < 0 or x >= len(self.ground) or y < 0):
+    elif(x < 0 or x >= len(self.ground)):
+      if(self.border == 'Loop'):
+        return self.check_collision(x%len(self.ground), y)
+      else:
+        return self.border == 'Wall'
+    elif(y < 0):
       return False
     else:
       return self.ground[int(x)][int(y)]
+
+  # (x, y) moved by x_off, y_off according to this world's rules
+  def moveby(self, x, y, x_off, y_off):
+    if(self.border == 'Loop'):
+      return (x+x_off)%len(self.ground) , y + y_off
+    else:
+      return x + x_off, y + y_off

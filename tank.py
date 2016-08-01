@@ -106,25 +106,23 @@ class Tank():
       if self.angle <= pi/2:
         self.angle = pi - self.angle
       else:
-        if self.fuel > 0 and self.x > tanksize:
+        if self.fuel > 0:
           if not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(tanksize)]):
-            self.x    -= 1
+            self.x, self.y = self.world.moveby(self.x, self.y, -1, 0)
             self.fuel -= 1
           elif not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(1, tanksize+1)]):
-            self.x    -= 1
-            self.y    -= 1
+            self.x, self.y = self.world.moveby(self.x, self.y, -1, -1)
             self.fuel -= 1
     elif (key == curses.KEY_RIGHT):
       if self.angle >= pi/2:
         self.angle = pi - self.angle
       else:
-        if self.fuel > 0 and self.x + tanksize < w-1:
+        if self.fuel > 0:
           if not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(tanksize+1)]):
-            self.x    += 1
+            self.x, self.y = self.world.moveby(self.x, self.y, 1, 0)
             self.fuel -= 1
           elif not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(1, tanksize+2)]):
-            self.x    += 1
-            self.y    -= 1
+            self.x, self.y = self.world.moveby(self.x, self.y, 1, -1)
             self.fuel -= 1
     elif (key == curses.KEY_UP):
       if (self.angle <= pi/2):
