@@ -28,17 +28,17 @@ Up/Down     : Change cannon elevation
 ### What Works
 
 - Shooting eachother
+- Moving around
 - Dying
 - Random Landscape
 - Up to 4 Players
+- 7 Different Weapons
+- 5 Different Landscape styles
 - Destructible Landscape
 - Wind
-- Snow (cosmetic only)
+- Snow/Rain/Stars (cosmetic only)
 
 ### Todo
 
-- Moving around
-- More than 1 weapon
-- Prettier Landscape
 - More interesting Landscape Generation
 - Prettier Tanks
