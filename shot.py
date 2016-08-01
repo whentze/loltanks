@@ -130,3 +130,35 @@ class Dirt_wedge(Shot):
   def explode(self):
     self.owner.x, self.owner.y = int(self.x), int(self.y)-3
     self.despawn()
+
+class Leapfrog(Drill_shot):
+  char = '〰'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+    self.explosions = 4
+  def explode(self):
+    self.speed_y *= -0.6
+    self.speed_x *= 0.4
+    Drill_shot.explode(self)
+
+class Clusterbomb(Shot):
+  char = 'ꙮ'
+  def update(self, win):
+    Shot.update(self,win)
+    if(self.speed_y < 0):
+     self.explode()
+  def explode(self):
+    for i in range(0, 360, 60):
+      self.world.gameobjects += [Clusterpart(self.x, self.y, radians(i), 0.5, self.owner, self.conf, self)]
+    self.world.gameobjects += [Clusterpart(self.x, self.y, radians(i), 0, self.owner, self.conf, self)]
+    self.despawn()
+
+class Clusterpart(Shot):
+  char = 'ꙩ'
+  def __init__(self, x, y, angle, power, owner, conf, parent):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+    self.speed_x += parent.speed_x
+    self.speed_y += parent.speed_y
+  def explode(self):
+    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 10, 3)]
+    self.despawn()
