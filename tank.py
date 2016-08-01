@@ -76,7 +76,7 @@ class Tank():
               self.x,
               self.y,
               int(cos(self.angle) * (self.power*4.0*i)),
-              int(- sin(self.angle) * (self.power*4.0*i)))
+              int(- sin(self.angle) * (self.power*4.0*i)) - 1)
         try:
           if(i == 9):
             win.addstr(line_y, line_x, '✜', curses.color_pair(self.colors))
@@ -175,7 +175,7 @@ class Tank():
   def shoot(self):
     shot = self.arsenal[self.active_weapon][0](
                 self.x + (1+tanksize)*cos(self.angle),
-                self.y - (1+tanksize)*sin(self.angle),
+                self.y - (1+tanksize)*sin(self.angle) - 1,
                 self.angle,
                 self.power*self.conf['tank_power'],
                 self,
