@@ -3,8 +3,9 @@ import curses
 basic_conf = {
   'gamename'        : 'loltanks',
   'gravity'         : 10,
-  'sky_min'         : 7,
-  'ground_min'      : 3,
+  'sky_min'         : 0.2,
+  'ground_min'      : 0.2,
+  'ground_steepness': 0.8,
   'world_style'     : 'Block',
   'world_border'    : 'Void',
   'players_number'  : 3,
@@ -26,8 +27,9 @@ basic_conf = {
 nice_conf = {
   'gamename'        : 'loltanks',
   'gravity'         : 10,
-  'sky_min'         : 20,
-  'ground_min'      : 3,
+  'sky_min'         : 0.4,
+  'ground_min'      : 0.2,
+  'ground_steepness': 0.4,
   'world_style'     : 'Dirt',
   'world_border'    : 'Loop',
   'players_number'  : 2,

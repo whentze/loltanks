@@ -1,4 +1,4 @@
-from random import choice, randint, uniform
+from random import choice, randint, uniform, shuffle
 import curses
 
 from util import clamp
@@ -18,12 +18,24 @@ class World():
   def __init__(self, win, conf):
     h, w = win.getmaxyx()
     ground = [[False]*h for x in range(w)]
-    levels = [randint(conf['sky_min'], h - conf['ground_min'])]
-    for x in range(1, w):
-      levels += [clamp(
-          levels[-1] + choice([0,0,-1,1]),
-          conf['sky_min'],
-          h - conf['ground_min'])]
+
+    changes = [1, -1] * int(w*conf['ground_steepness']/2)
+    changes += [0] * (w - len(changes))
+    assert len(changes) == w
+    shuffle(changes)
+    min_y = int(h*conf['sky_min'])
+    max_y = int(h*(1-conf['ground_min']))
+    if(min_y >= max_y):
+       raise RuntimeError('Your sky_min and/or ground_min are too large for this terminal')
+    levels = [randint(min_y, max_y)]
+    for x in range(w-1):
+      assert(len(changes) == w - x)
+      next_y = levels[-1] + changes[0]
+      while(next_y < min_y or next_y > max_y):
+        shuffle(changes)
+        next_y = levels[-1] + changes[0]
+      levels += [next_y]
+      changes = changes[1:]
     for x in range(w):
       for y in range(h):
         ground[x][y] = levels[x] < y
