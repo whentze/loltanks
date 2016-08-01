@@ -42,8 +42,8 @@ def main(screen):
   screen.nodelay(True)
   screen.clear()
   screen.refresh()
-  mainwin = curses.newwin(height-6, width, 0, 0)
-  statuswin = curses.newwin(6, width, height-6, 0)
+  mainwin = curses.newwin(height-7, width, 0, 0)
+  statuswin = curses.newwin(7, width, height-7, 0)
 
   while(1):
     world = World(mainwin, conf)
@@ -100,6 +100,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     statuswin.addstr(stats_y+1, stats_x, "HP   : {:d}".format(player.health))
     statuswin.addstr(stats_y+2, stats_x, "Angle: {:.1f}°".format(degrees(player.angle)))
     statuswin.addstr(stats_y+3, stats_x, "Power: {:.0%}".format(player.power))
+    statuswin.addstr(stats_y+4, stats_x, "Fuel : {:d}L".format(player.fuel))
 
   # Global Stats
   stats_x = 2 + int(width * len(world.players)/(1+len(world.players)))
