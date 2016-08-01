@@ -115,12 +115,14 @@ class Dirt_wedge(Shot):
     self.angle = angle
     self.x, self.y = self.world.moveby(self.x, self.y, -3*cos(angle), 3*sin(angle))
   def update(self, win):
+    h, w = win.getmaxyx()
     self.age += 1
     for i in range(2*self.age):
       angle = self.angle + radians(25 * (-1 + i/self.age))
       x,y = self.world.moveby(self.x, self.y, cos(angle)*self.age, -sin(angle)*self.age)
-      self.wedge_points += [(int(x), int(y))]
-      self.world.destroy_ground(int(x), int(y))
+      wedge_x, wedge_y = clamp(int(x), 0, w-1), clamp(int(y), 0, h-1)
+      self.wedge_points += [(wedge_x, wedge_y)]
+      self.world.destroy_ground(wedge_x, wedge_y)
     if(self.age >= 10):
       self.despawn()
   def draw(self, win):
