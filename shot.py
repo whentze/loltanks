@@ -100,7 +100,7 @@ class Drill_shot(Shot):
     Shot.__init__(self, x, y, angle, power, owner, conf)
     self.explosions = 3
   def explode(self):
-    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 15, 5)]
+    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 15, 4)]
     self.explosions -= 1
     if(self.explosions == 0):
       self.despawn()
