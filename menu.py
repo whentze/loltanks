@@ -72,7 +72,7 @@ def confmenu(conf, win):
     instructions.addstr(2, int(w*0.4)-15, 'Space : Fire ')
     instructions.addstr(3, int(w*0.4)-15, ' ↑/↓  : Aim')
     instructions.addstr(2, int(w*0.6)-10,   '+/- : Set Power')
-    instructions.addstr(3, int(w*0.6)-10,   '←/→ : Turn')
+    instructions.addstr(3, int(w*0.6)-10,   '←/→ : Turn/Move')
     instructions.box()
     instructions.refresh()
 
