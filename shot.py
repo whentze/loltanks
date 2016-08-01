@@ -67,16 +67,10 @@ class Shot():
     self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 30, 5)]
     self.despawn()
   def update(self, win):
-    self.x += self.speed_x
-    self.y -= self.speed_y
+    self.x, self.y = self.world.moveby(self.x, self.y, self.speed_x, -self.speed_y)
     self.speed_x += self.conf['wind_force']*self.world.wind
     self.speed_y -= self.conf['gravity'] * 0.001
     h, w = win.getmaxyx()
-    if(self.x < 0 or self.x >= w):
-        if(self.conf['world_border'] == 'Loop'):
-          self.x = self.x % w
-        elif(self.conf['world_border'] == 'Wall'):
-          self.explode()
     if (self.y > h):
       self.despawn()
       return
