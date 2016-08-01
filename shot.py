@@ -149,7 +149,7 @@ class Clusterbomb(Shot):
      self.explode()
   def explode(self):
     for i in range(0, 360, 60):
-      self.world.gameobjects += [Clusterpart(self.x, self.y, radians(i), 0.5, self.owner, self.conf, self)]
+      self.world.gameobjects += [Clusterpart(self.x, self.y, radians(i), 0.2, self.owner, self.conf, self)]
     self.world.gameobjects += [Clusterpart(self.x, self.y, radians(i), 0, self.owner, self.conf, self)]
     self.despawn()
 
