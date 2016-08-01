@@ -19,6 +19,7 @@ def lines():
   }
 
 class Shot():
+  char = '●'
   def __init__(self, x, y, angle, power, owner, conf):
     self.x        = x
     self.y        = y
@@ -39,7 +40,7 @@ class Shot():
     elif(self.x > w):
       c = '>'
     else:
-      c = '●'
+      c = self.char
     display_y = clamp(int(self.y), 0, h-1)
     display_x = clamp(int(self.x), 0, w-1)
     if(self.age>3):
@@ -63,9 +64,13 @@ class Shot():
     self.world.gameobjects.remove(self)
     del(self)
   def explode(self):
-    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, self.conf)]
+    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 30, 5)]
     self.despawn()
   def update(self, win):
+    self.x += self.speed_x
+    self.y -= self.speed_y
+    self.speed_x += self.conf['wind_force']*self.world.wind
+    self.speed_y -= self.conf['gravity'] * 0.001
     h, w = win.getmaxyx()
     if(self.x < 0 or self.x >= w):
         if(self.conf['world_border'] == 'Loop'):
@@ -79,8 +84,23 @@ class Shot():
         or min([dist(self, p) for p in self.world.players]) < 2):
       self.explode()
       return
-    self.x += self.speed_x
-    self.y -= self.speed_y
-    self.speed_x += self.conf['wind_force']*self.world.wind
-    self.speed_y -= self.conf['gravity'] * 0.001
     self.age += 1
+    
+class Heavy_shot(Shot):
+  char = '☢'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+  def explode(self):
+    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 50, 8)]
+    self.despawn()
+
+class Drill_shot(Shot):
+  char = '⁂'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+    self.explosions = 3
+  def explode(self):
+    self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 15, 5)]
+    self.explosions -= 1
+    if(self.explosions == 0):
+      self.despawn()

@@ -4,15 +4,14 @@ from math import sin, cos, radians
 from util import clamp, dist
 
 class Explosion():
-  def __init__(self, x, y, owner, conf):
+  def __init__(self, x, y, owner, damage, radius):
     self.x      = x
     self.y      = y
-    self.age    = 0
+    self.age    = 1
     self.owner  = owner
     self.world  = owner.world
-    self.conf   = conf
-    self.damage = conf['explosion_damage']
-    self.radius = conf['explosion_radius']
+    self.damage = damage
+    self.radius = radius
   def update(self, win):
     if(self.age >= self.radius):
       for p in self.world.players:
@@ -30,12 +29,11 @@ class Explosion():
   def draw(self, win):
     h, w = win.getmaxyx()
     for i in range(self.age):
-      for theta in range(0, 360, 4):
-        if(self.conf['world_border'] == 'Loop'):
-          display_x = int(self.x + cos(radians(theta)) * i) % w
-        else:
-          display_x = clamp(int(self.x + cos(radians(theta)) * i), 0, w)
-        display_y = clamp(int(self.y - sin(radians(theta)) * i), 0, h)
+      for theta in range(0, 360, 1+int(10/(i+1))):
+        display_x, display_y = self.world.moveby(self.x, self.y, 
+            cos(radians(theta)) * i,
+            -sin(radians(theta)) * i)
+        display_x, display_y = int(display_x), int(display_y)
         if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
           self.world.destroy_ground(display_x, display_y)
         try:

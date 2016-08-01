@@ -1,4 +1,5 @@
 from math import pi, sin, cos
+import copy
 import curses
 
 from util import clamp
@@ -8,20 +9,23 @@ tanksize = 2
 
 class Tank():
   def __init__(self, x, y, name, colors, world, conf):
-    self.x          = x
-    self.y          = y
-    self.name       = name
-    self.colors     = colors
-    self.world      = world
-    self.conf       = conf
-    self.health     = conf['tank_health']
-    self.fuel       = conf['tank_fuel']
-    self.shot       = None
-    self.angle      = pi/4
-    self.isdead     = False
-    self.shot_fired = False
-    self.isdone     = True
-    self.power      = 0.50
+    self.x              = x
+    self.y              = y
+    self.name           = name
+    self.colors         = colors
+    self.world          = world
+    self.conf           = conf
+    self.health         = conf['tank_health']
+    self.fuel           = conf['tank_fuel']
+    self.arsenal        = copy.deepcopy(conf['tank_arsenal'])
+    self.active_weapon  = 0
+    self.weapon_display_timer = 0
+    self.shot           = None
+    self.angle          = pi/4
+    self.isdead         = False
+    self.shot_fired     = False
+    self.isdone         = True
+    self.power          = 0.50
     self.pic =[
     r' ___  ',
     r'/lol\=',
@@ -80,6 +84,19 @@ class Tank():
             win.addstr(line_y, line_x, '·', curses.color_pair(self.colors))
         except curses.error:
           pass
+    # Draw Selected Weapon
+    if(self.weapon_display_timer > 0):
+      weapon = self.arsenal[self.active_weapon]
+      weaponwin = win.derwin(3, 7, self.y - 5, self.x - 3)
+      try:
+        weaponwin.box()
+        if(weapon[1] == -1):
+          weaponwin.addstr(1, 3, weapon[0].char)
+        else:
+          weaponwin.addstr(1, 2, weapon[0].char + ':' + str(weapon[1]))
+      except curses.error:
+        pass
+      weaponwin.refresh()
     # Draw Tank
     h, w = win.getmaxyx()
     for n,line in enumerate(self.pic):
@@ -92,6 +109,7 @@ class Tank():
       win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
 
   def update(self, win):
+    self.weapon_display_timer = max(0, self.weapon_display_timer - 1)
     if(all(
         [not self.world.check_collision(xi, self.y+1) for xi in
             range(self.x-tanksize, self.x+tanksize+1)])):
@@ -104,8 +122,14 @@ class Tank():
   def processkey(self, key, win):
     h, w = win.getmaxyx()
     if (key == ord(' ')):
-      self.shoot()
-      return True
+      weapon = self.arsenal[self.active_weapon]
+      if (weapon[1] != 0):
+        self.shoot()
+        if(weapon[1] != -1):
+          weapon[1] = max(0, weapon[1] - 1)
+        return True
+      else:
+        self.weapon_display_timer = 50
     elif (key == curses.KEY_LEFT):
       if self.angle <= pi/2:
         self.angle = pi - self.angle
@@ -142,9 +166,15 @@ class Tank():
       self.power = min(1.00, self.power+0.01)
     elif (key == ord('-')):
       self.power = max(0.00, self.power-0.01)
+    elif (key in map(lambda k : ord(str(k)), range(10))):
+      n = int(chr(key))
+      self.active_weapon = (n-1) % len(self.arsenal)
+      self.weapon_display_timer = 50
+      
     return False
   def shoot(self):
-    shot = Shot(self.x + (1+tanksize)*cos(self.angle),
+    shot = self.arsenal[self.active_weapon][0](
+                self.x + (1+tanksize)*cos(self.angle),
                 self.y - (1+tanksize)*sin(self.angle),
                 self.angle,
                 self.power*self.conf['tank_power'],

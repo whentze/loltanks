@@ -19,8 +19,6 @@ def confmenu(conf, win):
   entries=[
     Menuentry('players_number', 'Number of Players', conf, range(2,5)),
     Menuentry('tank_health', 'Player Health', conf, [1, 25, 50, 100, 150, 200]),
-    Menuentry('explosion_damage', 'Shot Damage', conf, range(10,51,10)),
-    Menuentry('explosion_radius', 'Explosion Radius', conf, range(1,11)),
     Menuentry('gravity',  'Gravity', conf, range(51)),
     Menuentry('wind_max', 'Wind', conf, range(21)),
     Menuentry('particles_type', 'Particle Type', conf, ['Snow', 'Rain', 'Stars']),

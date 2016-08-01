@@ -1,4 +1,5 @@
 import curses
+import shot
 
 basic_conf = {
   'gamename'        : 'loltanks',
@@ -11,15 +12,14 @@ basic_conf = {
   'players_number'  : 3,
   'players_colors'  : [curses.COLOR_RED, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_YELLOW],
   'tank_health'     : 100,
-  'tank_fuel'       : 50,
+  'tank_fuel'       : 10,
   'tank_power'      : 1.5,
+  'tank_arsenal'    : [[shot.Shot, -1], [shot.Heavy_shot, 2], [shot.Drill_shot, 1]],
   'wind_max'        : 5,
   'wind_change'     : 2,
   'wind_force'      : 0.0010,
   'particles_type'  : 'Snow',
   'particles_max'   : 3.0,
-  'explosion_damage': 30,
-  'explosion_radius': 5,
   'shot_age'        : 500,
   'shot_tail'        : 7,
 }
