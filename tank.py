@@ -63,13 +63,16 @@ class Tank():
       '''  ___ ''',
       '''=/lol\\''',
       ''' OOOOO''']
-    display_y = self.y - tanksize
-    display_x = self.x - int(max([len(line) for line in self.pic])/2)
+    upper_y = self.y - tanksize
+    left_x = self.x - int(max([len(line) for line in self.pic])/2)
     # Draw Crosshair
     if (not self.isdone):
       for i in range(10):
-        line_x = int(self.x + cos(self.angle) * (self.power*4.0*i))
-        line_y = int(self.y - sin(self.angle) * (self.power*4.0*i))
+        line_x, line_y = self.world.moveby(
+              self.x,
+              self.y,
+              int(cos(self.angle) * (self.power*4.0*i)),
+              int(- sin(self.angle) * (self.power*4.0*i)))
         try:
           if(i == 9):
             win.addstr(line_y, line_x, '✜', curses.color_pair(self.colors))
@@ -81,9 +84,10 @@ class Tank():
     h, w = win.getmaxyx()
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
-        if(char != ' ' and display_x+k == clamp(display_x+k, 0, w-1)
-                       and display_y+n == clamp(display_y+n, 0, h-1)):
-          win.addstr(display_y+n, display_x+k, char)
+        draw_x, draw_y = self.world.moveby(left_x, upper_y, k, n)
+        if(char != ' ' and draw_x == clamp(draw_x, 0, w-1)
+                       and draw_y == clamp(draw_y, 0, h-1)):
+          win.addstr(draw_y, draw_x, char)
     if(self.y == clamp(self.y, 0, h-1) and self.x == clamp(self.x, 0, w-1)):
       win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
 

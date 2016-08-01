@@ -2,6 +2,7 @@ from math import pi
 
 import curses
 import tank
+import world
 
 class Menuentry():
   def __init__(self, key, name, conf, possible_values):
@@ -30,9 +31,10 @@ def confmenu(conf, win):
 
   pad = curses.newpad(2*len(entries) + 3, w)
 
-  model1 = tank.Tank(int(w/2) - 20, 2, 'model1', curses.color_pair(0), None, conf)
+  dummyworld = world.World(win, conf)
+  model1 = tank.Tank(int(w/2) - 20, 2, 'model1', curses.color_pair(0), dummyworld, conf)
   model1.angle = 0
-  model2 = tank.Tank(int(w/2) + 20, 2, 'model1', curses.color_pair(0), None, conf)
+  model2 = tank.Tank(int(w/2) + 20, 2, 'model1', curses.color_pair(0), dummyworld, conf)
   model2.angle = pi
 
   while(1):
