@@ -125,7 +125,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
     pass
 
   if(not currentplayer.shot_fired):
-    currentplayer.processkey(key)
+    currentplayer.processkey(key, mainwin)
   else:
     mainwin.addstr(1,1,'shots fired!')
 

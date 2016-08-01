@@ -77,11 +77,14 @@ class Tank():
         except curses.error:
           pass
     # Draw Tank
+    h, w = win.getmaxyx()
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
-        if(char != ' '):
+        if(char != ' ' and display_x+k == clamp(display_x+k, 0, w-1)
+                       and display_y+n == clamp(display_y+n, 0, h-1)):
           win.addstr(display_y+n, display_x+k, char)
-    win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
+    if(self.y == clamp(self.y, 0, h-1) and self.x == clamp(self.x, 0, w-1)):
+      win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
 
   def update(self, win):
     if(all(
@@ -93,14 +96,29 @@ class Tank():
       self.isdead = True
       self.isdone = True
 
-  def processkey(self, key):
+  def processkey(self, key, win):
+    h, w = win.getmaxyx()
     if (key == ord(' ')):
       self.shoot()
       return True
-    elif (key == curses.KEY_LEFT and self.angle <= pi/2):
+    elif (key == curses.KEY_LEFT):
+      if self.angle <= pi/2:
         self.angle = pi - self.angle
-    elif (key == curses.KEY_RIGHT and self.angle >= pi/2):
-      self.angle = pi - self.angle
+      else:
+        if not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(tanksize)]) and self.x > tanksize:
+          self.x = self.x - 1
+        elif not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(1, tanksize+1)]) and self.x > tanksize:
+          self.x = self.x - 1
+          self.y = self.y - 1
+    elif (key == curses.KEY_RIGHT):
+      if self.angle >= pi/2:
+        self.angle = pi - self.angle
+      else:
+        if not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(tanksize+1)]) and self.x + tanksize < w-1:
+          self.x = self.x + 1
+        elif not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(1, tanksize+2)]) and self.x + tanksize < w-1:
+          self.x = self.x + 1
+          self.y = self.y - 1
     elif (key == curses.KEY_UP):
       if (self.angle <= pi/2):
         self.angle = min(pi/2.001, self.angle+0.01)
