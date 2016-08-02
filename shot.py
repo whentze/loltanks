@@ -71,10 +71,7 @@ class Shot():
     self.speed_x += self.conf['wind_force']*self.world.wind
     self.speed_y -= self.conf['gravity'] * 0.001
     h, w = win.getmaxyx()
-    if (self.y > h):
-      self.despawn()
-      return
-    elif (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y)
+    if (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y)
         or min([dist(self, p) for p in self.world.players]) < 2):
       self.explode()
       return
