@@ -55,9 +55,9 @@ def main(screen):
         continue
       world.wind = randint(max(-conf['wind_max'], world.wind-conf['wind_change']),
                            min( conf['wind_max'], world.wind+conf['wind_change']))
-      p.isdone = False
-      p.shot_fired = False
-      while (not p.isdone and not len([p for p in world.players if not p.isdead]) <= 1 ):
+      p.isactive = True
+      p.active_shots = 0
+      while ((p.isactive or p.active_shots > 0) and not len([p for p in world.players if not p.isdead]) <= 1 ):
         gamestep(screen, mainwin, statuswin, p, world, conf, n_turns)
       if (len([p for p in world.players if not p.isdead]) == 1):
         gameover(screen, [p for p in world.players if not p.isdead][0])
@@ -125,7 +125,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
   except Error:  
     pass
 
-  if(not currentplayer.shot_fired):
+  if(currentplayer.active_shots == 0):
     currentplayer.processkey(key, mainwin)
   else:
     mainwin.addstr(1,1,'shots fired!')

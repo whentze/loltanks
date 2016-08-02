@@ -20,11 +20,10 @@ class Tank():
     self.arsenal        = copy.deepcopy(conf['tank_arsenal'])
     self.active_weapon  = 0
     self.weapon_display_timer = 0
-    self.shot           = None
     self.angle          = pi/4
     self.isdead         = False
-    self.shot_fired     = False
-    self.isdone         = True
+    self.active_shots   = 0
+    self.isactive       = False
     self.power          = 0.50
     self.pic =[
     r' ___  ',
@@ -70,7 +69,7 @@ class Tank():
     upper_y = self.y - tanksize
     left_x = self.x - int(max([len(line) for line in self.pic])/2)
     # Draw Crosshair
-    if (not self.isdone):
+    if (self.isactive):
       for i in range(10):
         line_x, line_y = self.world.moveby(
               self.x,
@@ -116,8 +115,8 @@ class Tank():
       self.y += 1
     
     if(self.health <= 0):
-      self.isdead = True
-      self.isdone = True
+      self.isdead   = True
+      self.isactive = False
 
   def processkey(self, key, win):
     h, w = win.getmaxyx()
@@ -181,4 +180,4 @@ class Tank():
                 self,
                 self.conf)
     self.world.gameobjects += [shot]
-    self.shot_fired = True
+    self.isactive = False

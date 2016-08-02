@@ -30,6 +30,7 @@ class Shot():
     self.owner    = owner
     self.world    = owner.world
     self.conf     = conf
+    owner.active_shots += 1
 
   def draw(self, win):
     h, w =win.getmaxyx()
@@ -60,7 +61,7 @@ class Shot():
       self.tail = self.tail[1:]
 
   def despawn(self):
-    self.owner.isdone = True
+    self.owner.active_shots -= 1
     self.world.gameobjects.remove(self)
     del(self)
   def explode(self):
