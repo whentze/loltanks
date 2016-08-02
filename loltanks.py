@@ -36,6 +36,12 @@ def main(screen):
   if(height < 20 or width < 50):
     raise RuntimeError("This terminal is too damn small!")
 
+  if not (curses.has_colors()):
+    raise RuntimeError("This terminal does not support colors!")
+
+  if not (curses.can_change_color()):
+    raise RuntimeError("This terminal does not support changing color definitions!")
+
   conf = configs.nice_conf
   menu.confmenu(conf, screen)
 
