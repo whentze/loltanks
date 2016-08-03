@@ -1,5 +1,6 @@
 from math import sin, cos, atan2, radians
 from random import choice
+from collections import namedtuple
 import curses
 
 from util import clamp, dist
@@ -162,3 +163,28 @@ class Clusterpart(Shot):
   def explode(self):
     self.world.gameobjects += [Explosion(self.x, self.y, self.owner, 10, 3)]
     self.despawn()
+
+class Laserbeam(Shot):
+  char = '𐐡'
+  def __init__(self, x, y, angle, power, owner, conf):
+    Shot.__init__(self, x, y, angle, power, owner, conf)
+    self.laser_points = []
+    for i in range(100):
+      laser_x, laser_y = self.world.moveby(x, y, i * cos(angle), -i*sin(angle))
+      Point = namedtuple('Point', 'x y')
+      newpoint = Point(int(laser_x), int(laser_y))
+      self.laser_points += [newpoint]
+      for p in self.world.players:
+        if(dist(newpoint, p) < 2):
+          p.health = max(0, p.health - (8 - int(i/20)))
+
+  def update(self, win):
+    self.age += 1
+    if(self.age >= 24):
+      self.despawn()
+  def draw(self, win):
+    for (x, y) in self.laser_points:
+      try:
+        win.addch(y, x, ['█', '▓', '▒', '░', ' '][int(self.age/5)], curses.color_pair(self.owner.colors))
+      except curses.error:
+        pass
