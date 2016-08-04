@@ -78,9 +78,10 @@ class Tank():
         except curses.error:
           pass
     # Draw Selected Weapon
+    h, w = win.getmaxyx()
     if(self.weapon_display_timer > 0):
       weapon = self.arsenal[self.active_weapon]
-      weaponwin = win.derwin(3, 7, self.pos.y - 5, self.pos.x - 3)
+      weaponwin = win.derwin(3, 7, clamp(self.pos.y - 5, 0, h-3), clamp(self.pos.x - 3, 0, w-7))
       try:
         weaponwin.box()
         if(weapon[1] == -1):
@@ -92,7 +93,6 @@ class Tank():
       weaponwin.refresh()
     # Draw Tanks
     upperleft = self.pos + (-int(max([len(line) for line in self.pic])/2), -tanksize)
-    h, w = win.getmaxyx()
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
         draw = upperleft + (k, n)
