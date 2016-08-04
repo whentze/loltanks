@@ -55,13 +55,6 @@ class World():
         self.paint(x, y)
 
     gameobjects = [self]
-    try:
-      gameobjects += [self.portal_red, self.portal_blue]
-      self.portal_red.other = self.portal_blue
-      self.portal_blue.other = self.portal_red
-      self.portals = True
-    except AttributeError:
-      self.portals = False
     players     = []
     for i in range(conf['players_number']):
       curses.init_pair(i+1, conf['players_colors'][i], SKYBG)
@@ -69,6 +62,13 @@ class World():
       newplayer = Tank((x, min(levels[x-2:x+3])), "Player {:d}".format(i+1), i+1, self, conf)
       players += [newplayer]
       gameobjects += [newplayer]
+    try:
+      gameobjects += [self.portal_red, self.portal_blue]
+      self.portal_red.other = self.portal_blue
+      self.portal_blue.other = self.portal_red
+      self.portals = True
+    except AttributeError:
+      self.portals = False
 
     self.wind         = randint(-conf['wind_max'], conf['wind_max'])
     
