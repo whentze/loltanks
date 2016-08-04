@@ -3,7 +3,7 @@ from random import choice
 from collections import namedtuple
 import curses
 
-from util import clamp, dist
+from util import clamp, dist, Point
 from explosion import Explosion
 
 def lines():
@@ -171,7 +171,8 @@ class Laserbeam(Shot):
     self.laser_points = []
     for i in range(100):
       laser_x, laser_y = self.world.moveby(x, y, i * cos(angle), -i*sin(angle))
-      Point = namedtuple('Point', 'x y')
+      if(self.world.check_collision(laser_x, laser_y)):
+        break
       newpoint = Point(int(laser_x), int(laser_y))
       self.laser_points += [newpoint]
       for p in self.world.players:

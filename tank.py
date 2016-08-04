@@ -2,7 +2,7 @@ from math import pi, sin, cos
 import copy
 import curses
 
-from util import clamp
+from util import clamp, Point
 from shot import Shot
 
 tanksize = 2
@@ -113,7 +113,10 @@ class Tank():
         [not self.world.check_collision(xi, self.y+1) for xi in
             range(self.x-tanksize, self.x+tanksize+1)])):
       self.y += 1
-    
+
+    self.muzzle = self.world.moveby(self.x, self.y,
+         (1+tanksize)*cos(self.angle),
+        -(1+tanksize)*sin(self.angle))
     if(self.health <= 0):
       self.isdead   = True
       self.isactive = False
@@ -173,8 +176,8 @@ class Tank():
     return False
   def shoot(self):
     shot = self.arsenal[self.active_weapon][0](
-                self.x + (1+tanksize)*cos(self.angle),
-                self.y - (1+tanksize)*sin(self.angle) - 1,
+                self.muzzle.x,
+                self.muzzle.y,
                 self.angle,
                 self.power*self.conf['tank_power'],
                 self,
