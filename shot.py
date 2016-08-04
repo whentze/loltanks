@@ -1,6 +1,5 @@
 from math import sin, cos, atan2, radians
 from random import choice
-from collections import namedtuple
 import curses
 
 from util import clamp, dist, Point
