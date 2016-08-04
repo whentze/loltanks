@@ -3,6 +3,7 @@ import curses
 
 from util import clamp, Point
 from tank import Tank
+from portal import Portal
 import blockgraphics
 
 waves =[[1,1,1,1,1,0,0,0,0,0],
@@ -18,8 +19,11 @@ class World():
   def __init__(self, win, conf):
     h, w = win.getmaxyx()
     ground = [[False]*h for x in range(w)]
+    portal_radius = h//12
+    portal_size = 2*portal_radius + 1
 
     changes = [1, -1] * int(w*conf['ground_steepness']/2)
+    changes += [-portal_size, portal_size]
     changes += [0] * (w - len(changes))
     assert len(changes) == w
     shuffle(changes)
@@ -29,12 +33,15 @@ class World():
        raise RuntimeError('Your sky_min and/or ground_min are too large for this terminal')
     levels = [randint(min_y, max_y)]
     for x in range(w-1):
-      assert(len(changes) == w - x)
       next_y = levels[-1] + changes[0]
       while(next_y < min_y or next_y > max_y):
         shuffle(changes)
         next_y = levels[-1] + changes[0]
       levels += [next_y]
+      if(changes[0] == portal_size):
+        self.portal_red = Portal(Point(x+1, next_y - portal_radius, self), 'y', portal_radius, curses.color_pair(1))
+      if(changes[0] == -portal_size):
+        self.portal_blue = Portal(Point(x, next_y + portal_radius + 1, self), 'y', portal_radius, curses.color_pair(2))
       changes = changes[1:]
     for x in range(w):
       for y in range(h):
@@ -48,6 +55,14 @@ class World():
         self.paint(x, y)
 
     gameobjects = [self]
+    try:
+      gameobjects += [self.portal_red, self.portal_blue]
+      self.portal_red.other = self.portal_blue
+      self.portal_blue.other = self.portal_red
+    except NameError:
+      self.portals = False
+    finally:
+      self.portals = True
     players     = []
     for i in range(conf['players_number']):
       curses.init_pair(i+1, conf['players_colors'][i], SKYBG)
@@ -204,6 +219,22 @@ class World():
 
   # point moved by x_off, y_off according to this world's rules
   def moveby(self, p, x_off, y_off):
+    if(self.portals):
+      for portal in [self.portal_red, self.portal_blue]:
+        x_dif = portal.pos.x - p.x
+        y_dif = portal.pos.y - p.y
+        if(portal.dimension == 'x'):
+          if((p.y < portal.pos.y and p.y + y_off >= portal.pos.y or 
+              p.y > portal.pos.y and p.y + y_off <= portal.pos.y) and
+              abs(x_dif) < portal.radius):
+            return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
+        elif(portal.dimension == 'y'):
+          if((p.x <= portal.pos.x and p.x + x_off > portal.pos.x) and
+              abs(y_dif) < portal.radius):
+            return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
+          elif((p.x > portal.pos.x and p.x + x_off <= portal.pos.x) and
+              abs(y_dif) < portal.radius):
+            return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
     if(self.border == 'Loop'):
       return Point((p.x+x_off)%len(self.ground) , p.y + y_off, self)
     else:
