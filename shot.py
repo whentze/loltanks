@@ -74,7 +74,7 @@ class Shot():
     self.speed_y -= self.conf['gravity'] * 0.001
     h, w = win.getmaxyx()
     if (self.age > self.conf['shot_age'] or self.world.check_collision(self.x, self.y)
-        or min([dist(self, p) for p in self.world.players]) < 2):
+        or min([dist(self, p.pos) for p in self.world.players]) < 2):
       self.explode()
       return
     self.age += 1
@@ -176,7 +176,7 @@ class Laserbeam(Shot):
       newpoint = Point(int(laser_x), int(laser_y))
       self.laser_points += [newpoint]
       for p in self.world.players:
-        if(dist(newpoint, p) < 2):
+        if(dist(newpoint, p.pos) < 2):
           p.health = max(0, p.health - (8 - int(i/20)))
 
   def update(self, win):

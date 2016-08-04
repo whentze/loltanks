@@ -41,9 +41,9 @@ def confmenu(conf, win):
     welcome = 'welcome to ' + conf['gamename'] + '!'
     win.addstr(1, int((w-len(welcome))/2), welcome)
     model1.draw(win)
-    win.addstr(model1.y-1, model1.x+5, '-=●')
+    win.addstr(model1.pos.y-1, model1.pos.x+5, '-=●')
     model2.draw(win)
-    win.addstr(model2.y-1, model2.x-7, '●=-')
+    win.addstr(model2.pos.y-1, model2.pos.x-7, '●=-')
 
     for y,entry in enumerate(entries):
       if(entry.index > 0):

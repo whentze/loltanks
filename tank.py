@@ -9,8 +9,7 @@ tanksize = 2
 
 class Tank():
   def __init__(self, x, y, name, colors, world, conf):
-    self.x              = x
-    self.y              = y
+    self.pos            = Point(x, y)
     self.name           = name
     self.colors         = colors
     self.world          = world
@@ -66,8 +65,6 @@ class Tank():
       '''  ___ ''',
       '''=/lol\\''',
       ''' OOOOO''']
-    upper_y = self.y - tanksize
-    left_x = self.x - int(max([len(line) for line in self.pic])/2)
     # Draw Crosshair
     if (self.isactive):
       for i in range(10):
@@ -86,7 +83,7 @@ class Tank():
     # Draw Selected Weapon
     if(self.weapon_display_timer > 0):
       weapon = self.arsenal[self.active_weapon]
-      weaponwin = win.derwin(3, 7, self.y - 5, self.x - 3)
+      weaponwin = win.derwin(3, 7, self.pos.y - 5, self.pos.x - 3)
       try:
         weaponwin.box()
         if(weapon[1] == -1):
@@ -96,25 +93,28 @@ class Tank():
       except curses.error:
         pass
       weaponwin.refresh()
-    # Draw Tank
+    # Draw Tanks
+    upperleft = self.world.moveby(*self.pos, 
+      -int(max([len(line) for line in self.pic])/2),
+      -tanksize)
     h, w = win.getmaxyx()
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
-        draw_x, draw_y = self.world.moveby(left_x, upper_y, k, n)
+        draw_x, draw_y = self.world.moveby(*upperleft, k, n)
         if(char != ' ' and draw_x == clamp(draw_x, 0, w-1)
                        and draw_y == clamp(draw_y, 0, h-1)):
           win.addstr(draw_y, draw_x, char)
-    if(self.y == clamp(self.y, 0, h-1) and self.x == clamp(self.x, 0, w-1)):
-      win.addstr(self.y, self.x, self.name[-1], curses.color_pair(self.colors))
+    if(self.pos == self.pos.clamp(0, w-1, 0, h-1)):
+      win.addstr(self.pos.y, self.pos.x, self.name[-1], curses.color_pair(self.colors))
 
   def update(self, win):
     self.weapon_display_timer = max(0, self.weapon_display_timer - 1)
     if(all(
-        [not self.world.check_collision(xi, self.y+1) for xi in
-            range(self.x-tanksize, self.x+tanksize+1)])):
-      self.y += 1
+        [not self.world.check_collision(xi, self.pos.y+1) for xi in
+            range(self.pos.x-tanksize, self.pos.x+tanksize+1)])):
+      self.pos = self.world.moveby(*self.pos, 0, 1)
 
-    self.muzzle = self.world.moveby(self.x, self.y,
+    self.muzzle = self.world.moveby(*self.pos,
          (1+tanksize)*cos(self.angle),
          -max(1,(tanksize)*sin(self.angle)))
     if(self.health <= 0):
@@ -137,22 +137,22 @@ class Tank():
         self.angle = pi - self.angle
       else:
         if self.fuel > 0:
-          if not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(tanksize)]):
-            self.x, self.y = self.world.moveby(self.x, self.y, -1, 0)
+          if not any([self.world.check_collision(self.pos.x - tanksize -1, self.pos.y -i) for i in range(tanksize)]):
+            self.pos = self.world.moveby(*self.pos, -1, 0)
             self.fuel -= 1
-          elif not any([self.world.check_collision(self.x - tanksize -1, self.y -i) for i in range(1, tanksize+1)]):
-            self.x, self.y = self.world.moveby(self.x, self.y, -1, -1)
+          elif not any([self.world.check_collision(self.pos.x - tanksize -1, self.pos.y -i) for i in range(1, tanksize+1)]):
+            self.pos = self.world.moveby(*self.pos, -1, -1)
             self.fuel -= 1
     elif (key == curses.KEY_RIGHT):
       if self.angle >= pi/2:
         self.angle = pi - self.angle
       else:
         if self.fuel > 0:
-          if not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(tanksize+1)]):
-            self.x, self.y = self.world.moveby(self.x, self.y, 1, 0)
+          if not any([self.world.check_collision(self.pos.x + tanksize +1, self.pos.y -i) for i in range(tanksize+1)]):
+            self.pos = self.world.moveby(*self.pos, 1, 0)
             self.fuel -= 1
-          elif not any([self.world.check_collision(self.x + tanksize +1, self.y -i) for i in range(1, tanksize+2)]):
-            self.x, self.y = self.world.moveby(self.x, self.y, 1, -1)
+          elif not any([self.world.check_collision(self.pos.x + tanksize +1, self.pos.y -i) for i in range(1, tanksize+2)]):
+            self.pos = self.world.moveby(*self.pos, 1, -1)
             self.fuel -= 1
     elif (key == curses.KEY_UP):
       if (self.angle <= pi/2):

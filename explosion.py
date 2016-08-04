@@ -15,7 +15,7 @@ class Explosion():
   def update(self, win):
     if(self.age >= self.radius):
       for p in self.world.players:
-        d = max(dist(self, p) - 2, 0) 
+        d = max(dist(self, p.pos) - 2, 0) 
         if (d < self.radius):
          damage = self.damage * (self.radius - d)/self.radius
          p.health = max(0, int(p.health - damage))
