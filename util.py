@@ -16,5 +16,3 @@ class Point(namedtuple('Point', 'x y')):
     return Point(-self.x, -self.y)
   def __mod__(self, other):
     return Point(self.x % other.x, self.y % other.y)
-  def __int__(self):
-    return Point(int(self.x), int(self.y))
