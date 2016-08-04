@@ -72,15 +72,15 @@ class Tank():
     if (self.isactive):
       for i in range(10):
         line_x, line_y = self.world.moveby(
-              self.x,
-              self.y,
-              int(cos(self.angle) * (self.power*4.0*i)),
-              int(- sin(self.angle) * (self.power*4.0*i)) - 1)
+              self.muzzle.x,
+              self.muzzle.y,
+              cos(self.angle) * (self.power*4.0*i),
+              - sin(self.angle) * (self.power*4.0*i))
         try:
           if(i == 9):
-            win.addstr(line_y, line_x, '✜', curses.color_pair(self.colors))
+            win.addstr(int(line_y), int(line_x), '✜', curses.color_pair(self.colors))
           else:
-            win.addstr(line_y, line_x, '·', curses.color_pair(self.colors))
+            win.addstr(int(line_y), int(line_x), '·', curses.color_pair(self.colors))
         except curses.error:
           pass
     # Draw Selected Weapon
@@ -116,7 +116,7 @@ class Tank():
 
     self.muzzle = self.world.moveby(self.x, self.y,
          (1+tanksize)*cos(self.angle),
-        -(1+tanksize)*sin(self.angle))
+         -max(1,(tanksize)*sin(self.angle)))
     if(self.health <= 0):
       self.isdead   = True
       self.isactive = False
