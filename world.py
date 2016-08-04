@@ -19,7 +19,9 @@ class World():
   def __init__(self, win, conf):
     h, w = win.getmaxyx()
     ground = [[False]*h for x in range(w)]
-    portal_radius = h//12
+    min_y = int(h*conf['sky_min'])
+    max_y = int(h*(1-conf['ground_min']))
+    portal_radius = (max_y - min_y)//5
     portal_size = 2*portal_radius + 1
 
     changes = [1, -1] * int(w*conf['ground_steepness']/2)
@@ -27,8 +29,6 @@ class World():
     changes += [0] * (w - len(changes))
     assert len(changes) == w
     shuffle(changes)
-    min_y = int(h*conf['sky_min'])
-    max_y = int(h*(1-conf['ground_min']))
     if(min_y >= max_y):
        raise RuntimeError('Your sky_min and/or ground_min are too large for this terminal')
     levels = [randint(min_y, max_y)]
@@ -59,10 +59,9 @@ class World():
       gameobjects += [self.portal_red, self.portal_blue]
       self.portal_red.other = self.portal_blue
       self.portal_blue.other = self.portal_red
-    except NameError:
-      self.portals = False
-    finally:
       self.portals = True
+    except AttributeError:
+      self.portals = False
     players     = []
     for i in range(conf['players_number']):
       curses.init_pair(i+1, conf['players_colors'][i], SKYBG)
@@ -229,11 +228,9 @@ class World():
               abs(x_dif) < portal.radius):
             return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
         elif(portal.dimension == 'y'):
-          if((p.x <= portal.pos.x and p.x + x_off > portal.pos.x) and
-              abs(y_dif) < portal.radius):
-            return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
-          elif((p.x > portal.pos.x and p.x + x_off <= portal.pos.x) and
-              abs(y_dif) < portal.radius):
+          if((p.x < portal.pos.x and p.x + x_off >= portal.pos.x or 
+              p.x >= portal.pos.x and p.x + x_off < portal.pos.x) and
+              abs(y_dif) <= portal.radius):
             return Point(portal.other.pos.x + x_off - x_dif, portal.other.pos.y + y_off - y_dif, self)
     if(self.border == 'Loop'):
       return Point((p.x+x_off)%len(self.ground) , p.y + y_off, self)
