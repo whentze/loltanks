@@ -21,7 +21,7 @@ class World():
     ground = [[False]*h for x in range(w)]
     min_y = int(h*conf['sky_min'])
     max_y = int(h*(1-conf['ground_min']))
-    portal_radius = (max_y - min_y)//5
+    portal_radius = max(2, (max_y - min_y)//8)
     portal_size = 2*portal_radius + 1
 
     changes = [1, -1] * int(w*conf['ground_steepness']/2)
