@@ -52,7 +52,7 @@ class World():
     for i in range(conf['players_number']):
       curses.init_pair(i+1, conf['players_colors'][i], SKYBG)
       x = int(w*(i+1.0)/(conf['players_number']+1))
-      newplayer = Tank(x, min(levels[x-2:x+3]), "Player {:d}".format(i+1), i+1, self, conf)
+      newplayer = Tank((x, min(levels[x-2:x+3])), "Player {:d}".format(i+1), i+1, self, conf)
       players += [newplayer]
       gameobjects += [newplayer]
 
@@ -189,22 +189,22 @@ class World():
         c = blockgraphics.pipes[neighbors]
       self.groundchars[x][y] = c
 
-  def check_collision(self, x, y):
-    if (y >= len(self.ground[0])):
+  def check_collision(self, p):
+    if (p.y >= len(self.ground[0])):
       return True
-    elif(x < 0 or x >= len(self.ground)):
+    elif(p.x < 0 or p.x >= len(self.ground)):
       if(self.border == 'Loop'):
-        return self.check_collision(x%len(self.ground), y)
+        return self.check_collision(Point(p.x%len(self.ground), p.y))
       else:
         return self.border == 'Wall'
-    elif(y < 0):
+    elif(p.y < 0):
       return False
     else:
-      return self.ground[int(x)][int(y)]
+      return self.ground[int(p.x)][int(p.y)]
 
-  # (x, y) moved by x_off, y_off according to this world's rules
-  def moveby(self, x, y, x_off, y_off):
+  # point moved by x_off, y_off according to this world's rules
+  def moveby(self, p, x_off, y_off):
     if(self.border == 'Loop'):
-      return Point((x+x_off)%len(self.ground) , y + y_off)
+      return Point((p.x+x_off)%len(self.ground) , p.y + y_off, self)
     else:
-      return Point(x + x_off, y + y_off)
+      return Point(p.x + x_off, p.y + y_off, self)

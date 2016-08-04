@@ -4,9 +4,8 @@ from math import sin, cos, radians
 from util import clamp, dist
 
 class Explosion():
-  def __init__(self, x, y, owner, damage, radius):
-    self.x      = x
-    self.y      = y
+  def __init__(self, pos, owner, damage, radius):
+    self.pos    = pos
     self.age    = 1
     self.owner  = owner
     self.world  = owner.world
@@ -15,7 +14,7 @@ class Explosion():
   def update(self, win):
     if(self.age >= self.radius):
       for p in self.world.players:
-        d = max(dist(self, p.pos) - 2, 0) 
+        d = max(dist(self.pos, p.pos) - 2, 0) 
         if (d < self.radius):
          damage = self.damage * (self.radius - d)/self.radius
          p.health = max(0, int(p.health - damage))
@@ -30,14 +29,11 @@ class Explosion():
     h, w = win.getmaxyx()
     for i in range(self.age):
       for theta in range(0, 360, 1+int(10/(i+1))):
-        display_x, display_y = self.world.moveby(self.x, self.y, 
-            cos(radians(theta)) * i,
-            -sin(radians(theta)) * i)
-        display_x, display_y = int(display_x), int(display_y)
-        if(display_x >= 0 and display_x < w and display_y >= 0 and display_y < h):
-          self.world.destroy_ground(display_x, display_y)
+        display = (self.pos + (cos(radians(theta)) * i, -sin(radians(theta)) * i)).int()
+        if(display.in_box(0, w, 0, h)):
+          self.world.destroy_ground(display.x, display.y)
         try:
-          win.addstr(display_y, display_x, '#')
+          win.addstr(display.y, display.x, '#')
         except curses.error:
           pass   
 
