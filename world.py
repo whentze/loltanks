@@ -1,7 +1,7 @@
 from random import choice, randint, uniform, shuffle
 import curses
 
-from util import clamp
+from util import clamp, Point
 from tank import Tank
 import blockgraphics
 
@@ -205,6 +205,6 @@ class World():
   # (x, y) moved by x_off, y_off according to this world's rules
   def moveby(self, x, y, x_off, y_off):
     if(self.border == 'Loop'):
-      return (x+x_off)%len(self.ground) , y + y_off
+      return Point((x+x_off)%len(self.ground), y + y_off)
     else:
-      return x + x_off, y + y_off
+      return Point(x + x_off, y + y_off)
