@@ -102,7 +102,7 @@ class Teleporter(Shot):
   def __init__(self, x, y, angle, power, owner, conf):
     Shot.__init__(self, x, y, angle, power, owner, conf)
   def explode(self):
-    self.owner.x, self.owner.y = int(self.x), int(self.y)-2
+    self.owner.pos = self.world.moveby(int(self.x), int(self.y), 0, -2)
     self.despawn()
 
 class Dirt_wedge(Shot):
