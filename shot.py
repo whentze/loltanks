@@ -163,7 +163,8 @@ class Laserbeam(Shot):
     Shot.__init__(self, pos, angle, power, owner, conf)
     self.laser_points = []
     for i in range(100):
-      newpoint = (pos + (i * cos(angle), -i*sin(angle))).int()
+      self.pos += (cos(angle), -sin(angle))
+      newpoint = self.pos.int()
       if(self.world.check_collision(newpoint)):
         break
       self.laser_points += [newpoint]

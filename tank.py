@@ -67,9 +67,11 @@ class Tank():
       ''' OOOOO''']
     # Draw Crosshair
     if (self.isactive):
+      p = self.muzzle
       for i in range(10):
-        dot = (self.muzzle + (cos(self.angle) * (self.power*4.0*i),
-              -sin(self.angle) * (self.power*4.0*i))).int()
+        p += (cos(self.angle) * (self.power*4.0),
+              -sin(self.angle) * (self.power*4.0))
+        dot = p.int()
         try:
           if(i == 9):
             win.addstr(dot.y, dot.x, '✜', curses.color_pair(self.colors))
@@ -92,10 +94,11 @@ class Tank():
         pass
       weaponwin.refresh()
     # Draw Tanks
-    upperleft = self.pos + (-int(max([len(line) for line in self.pic])/2), -tanksize)
+    x_off = -int(max([len(line) for line in self.pic])/2)
+    y_off = -tanksize
     for n,line in enumerate(self.pic):
       for k, char in enumerate(line):
-        draw = upperleft + (k, n)
+        draw = self.pos + (x_off + k, y_off + n)
         if(char != ' ' and draw.in_box(0, w, 0, h)):
           win.addstr(draw.y, draw.x, char)
     if(self.pos == self.pos.clamp(0, w-1, 0, h-1)):

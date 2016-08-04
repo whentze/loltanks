@@ -209,7 +209,7 @@ class World():
       return True
     elif(p.x < 0 or p.x >= len(self.ground)):
       if(self.border == 'Loop'):
-        return self.check_collision(Point(p.x%len(self.ground), p.y))
+        return self.check_collision(Point(p.x%len(self.ground), p.y, self))
       else:
         return self.border == 'Wall'
     elif(p.y < 0):
