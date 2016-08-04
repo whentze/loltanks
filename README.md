@@ -1,4 +1,4 @@
-# loltanks
+# secret portals branch of loltanks
 
 A turn-based artillery game with a curses frontend.
 
@@ -25,20 +25,11 @@ Up/Down     : Change cannon elevation
 
 +/-         : Change projectile velocity
 
-### What Works
+### What Doesn't Work
 
-- Shooting eachother
-- Moving around
-- Dying
-- Random Landscape
-- Up to 4 Players
-- 7 Different Weapons
-- 5 Different Landscape styles
-- Destructible Landscape
-- Wind
-- Snow/Rain/Stars (cosmetic only)
+- almost everything except portals
+- sometimes the portals too
 
 ### Todo
 
-- More interesting Landscape Generation
-- Prettier Tanks
+- make this work
