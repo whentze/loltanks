@@ -9,7 +9,7 @@ tanksize = 2
 
 class Tank():
   def __init__(self, pos, name, colors, world, conf):
-    self.pos            = Point(*pos, world)
+    self.pos            = Point(pos.x, pos.y, world)
     self.name           = name
     self.colors         = colors
     self.world          = world
