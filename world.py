@@ -141,7 +141,7 @@ class World():
       for x, col in enumerate(self.ground):
         for y, cell in enumerate(col):
           if(cell):
-              win.addch(y, x, self.groundchars[x][y], self.groundcolor)
+              win.addstr(y, x, self.groundchars[x][y], self.groundcolor)
     except curses.error:
       # The very last character will error so except only once
       pass
