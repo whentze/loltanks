@@ -3,16 +3,15 @@ import curses
 
 from util import clamp, Point
 from tank import Tank
-import blockgraphics
-
-waves =[[1,1,1,1,1,0,0,0,0,0],
-        [0,0,0,0,1,1,1,1,1,0]]
+import blockgraphics, colorpairs
 
 GROUNDFG   = 101
 GROUNDBG   = 102
-GROUNDPAIR = 7
-SKYBG      = 103
-SKYPAIR    = 8
+SKYFG      = 103
+SKYBG      = 104
+
+waves =[[1,1,1,1,1,0,0,0,0,0],
+        [0,0,0,0,1,1,1,1,1,0]]
 
 class World():
   def __init__(self, win, conf):
@@ -88,11 +87,12 @@ class World():
       curses.init_color(GROUNDBG,    0,    0,    0)
       # black
       curses.init_color(SKYBG,       0,    0,    0)
+    curses.init_color(SKYFG,      1000, 1000, 1000)
 
-    curses.init_pair(GROUNDPAIR, GROUNDFG, GROUNDBG)
-    self.groundcolor = curses.color_pair(GROUNDPAIR)
-    curses.init_pair(SKYPAIR, curses.COLOR_WHITE, SKYBG)
-    self.skycolor = curses.color_pair(SKYPAIR)
+    curses.init_pair(colorpairs.GROUNDPAIR, GROUNDFG, GROUNDBG)
+    self.groundcolor = curses.color_pair(colorpairs.GROUNDPAIR)
+    curses.init_pair(colorpairs.SKYPAIR, SKYFG, SKYBG)
+    self.skycolor = curses.color_pair(colorpairs.SKYPAIR)
 
   def update(self, win):
     h, w = win.getmaxyx()

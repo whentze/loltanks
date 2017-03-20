@@ -22,8 +22,7 @@ from random import randint, choice, uniform
 from util import clamp, dist
 from world import World
 from tank import Tank
-import configs
-import menu
+import configs, menu, colorpairs
 
 # Main Program
 def main(screen):
@@ -95,6 +94,7 @@ def gamestep(screen, mainwin, statuswin, currentplayer, world, conf, n_turns):
 
   # Status Window
   statuswin.box()
+  statuswin.bkgdset(' ', curses.color_pair(colorpairs.SKYPAIR))
   heigth, width = statuswin.getmaxyx()
   statuswin.addstr(0, int((width-len(conf['gamename'])-2)/2), ' '+conf['gamename']+' ')
 
